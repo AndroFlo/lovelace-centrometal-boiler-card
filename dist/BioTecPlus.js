@@ -2,8 +2,8 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.28"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.28"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.29"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.29"
 
 export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
@@ -122,7 +122,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
                 this.createImage("biotec/glow.png", 65, 435, 100, null, 3, "glow")
             )}
 
-            <!- Pump -->
+            <!-- Pump -->
             ${this.conditional(
                 this.values["boiler_pump_demand"] == 1,
                 this.createImage("peltec/demand_p.png", 443, 492, 12, null, 3, "boiler_pump_demand"),
@@ -171,7 +171,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             ${this.conditional(this.values["boiler_state"] != "OFF",
                 this.createImage("peltec/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
                 this.createText("", 32,
-                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "img/start_stop.png?v=0.0.28'); background-position: 0px 0px;",
+                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "img/start_stop.png?v=0.0.29'); background-position: 0px 0px;",
                     945, 390, 36, 36, 4, null, "boiler_state"))}
 
             <!-- Buffers -->
@@ -245,7 +245,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
                 ${this.dhwBufferArea.createText(
                     this.formatTemperature("domestic_hot_water") + " °C", 32, "color: #0000ff; text-align: center;",
                     48, 133, null, null, 4, null, "domestic_hot_water")}
-                    <!- Pump -->
+                    <!-- Pump -->
                     ${this.conditional(
                         this.values["second_pump_demand"] == 1,
                         this.dhwBufferArea.createImage("peltec/demand_p.png", 5, 199, 12, null, 6, "second_pump_demand"),

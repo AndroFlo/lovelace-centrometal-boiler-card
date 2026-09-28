@@ -3,10 +3,10 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { PelTecDisplay } from "./PelTec.js?v=0.0.28"
-import { CmPeletDisplay } from "./CmPelet.js?v=0.0.28"
-import { BioTecDisplay } from "./BioTec.js?v=0.0.28"
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.28"
+import { PelTecDisplay } from "./PelTec.js?v=0.0.29"
+import { CmPeletDisplay } from "./CmPelet.js?v=0.0.29"
+import { BioTecDisplay } from "./BioTec.js?v=0.0.29"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.29"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -27,7 +27,16 @@ class LovelaceCentrometalBoilerCard extends LitElement {
         // console.log("Size ", this.width, "x", this.height)
       })
     })
-    this.observer.observe(this)
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.observer.observe(this);
+  }
+
+  disconnectedCallback() {
+    this.observer.disconnect();
+    super.disconnectedCallback();
   }
 
   static get properties() {
@@ -113,8 +122,9 @@ class LovelaceCentrometalBoilerCard extends LitElement {
     this.style.cssText = "display: block;";
   }
 
+  // Masonry view: one unit is ~50px, the card is ~0.55 x its width high
   getCardSize() {
-    return 3;
+    return 6;
   }
 
   // Sections dashboard: full width, height follows the background image

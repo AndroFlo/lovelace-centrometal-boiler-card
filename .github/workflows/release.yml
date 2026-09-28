@@ -1,0 +1,27 @@
+name: Release
+
+# Pushing a version tag (e.g. 0.0.29) publishes a GitHub release, which HACS offers as a version
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v4"
+      - name: Check dist version matches the tag
+        run: |
+          if grep -rhoE 'v=[0-9]+\.[0-9]+\.[0-9]+' dist | sort -u | grep -vxq "v=${GITHUB_REF_NAME}"; then
+            echo "dist/ contains ?v= versions other than ${GITHUB_REF_NAME}:"
+            grep -rhoE 'v=[0-9]+\.[0-9]+\.[0-9]+' dist | sort | uniq -c
+            exit 1
+          fi
+      - name: Create release
+        uses: "softprops/action-gh-release@v2"
+        with:
+          generate_release_notes: true
