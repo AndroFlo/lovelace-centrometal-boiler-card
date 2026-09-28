@@ -3,10 +3,7 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { PelTecDisplay } from "./PelTec.js?v=0.0.29"
-import { CmPeletDisplay } from "./CmPelet.js?v=0.0.29"
-import { BioTecDisplay } from "./BioTec.js?v=0.0.29"
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.29"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -70,36 +67,11 @@ class LovelaceCentrometalBoilerCard extends LitElement {
   }
 
   configureDisplay() {
-    if (!("device_type" in this.config)) {
-      for (const property in this.hass.states) {
-        if (property.startsWith("sensor.")) {
-          var entity = property.substring(7)
-          if (entity.endsWith("_device_type")) {
-            var prefix = entity.substring(0, entity.length - 12)
-            this.config["device_type"] = this.hass.states[property].state
-            break;
-          }
-        }
-      }
+    // Only BioTec Plus is supported; device_type stays optional for older configs
+    if ("device_type" in this.config && this.config["device_type"].toLowerCase() !== "biopl") {
+      return "Boiler type not supported: " + this.config["device_type"] + ". Only BioTec Plus (biopl) is supported.";
     }
-
-    if (!("device_type" in this.config)) {
-      return "Centrometal boiler not found, please configure the card manually.";
-    }
-
-    switch (this.config["device_type"].toLowerCase()) {
-      case 'peltec':
-        return new PelTecDisplay(this).configureDisplay();
-      case 'cmpelet':
-      case 'cm_pelet':
-        return new CmPeletDisplay(this).configureDisplay();
-      case 'biotec':
-        return new BioTecDisplay(this).configureDisplay();
-      case 'biopl':
-        return new BioTecPlusDisplay(this).configureDisplay();
-      }
-
-    return "Boiler type not suppored: " + this.config["device_type"] + ".";
+    return new BioTecPlusDisplay(this).configureDisplay();
   }
 
   render() {
@@ -148,7 +120,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "centrometal-boiler-card",
   name: "Centrometal Boiler Card",
-  description: "Display of Centrometal boilers (PelTec, CM Pelet-set, BioTec-L, BioTec Plus)",
+  description: "Display of the Centrometal BioTec Plus boiler",
   documentationURL: "https://github.com/AndroFlo/lovelace-centrometal-boiler-card",
 });
 

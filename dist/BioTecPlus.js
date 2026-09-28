@@ -2,8 +2,8 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.29"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.29"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30"
 
 export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
@@ -73,16 +73,16 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             ${this.conditional(
                 this.values["fire_sensor"] < 1000,
                 html`${this.createText(this.values["fire_sensor"] + "k", 22, "color: #000000;", 347, 374, null, null, 2, null, "fire_sensor")}
-                     ${this.createImage("peltec/vatra.gif", 302, 390, 40, null, 2, "fire_sensor")}`)}
+                     ${this.createImage("biopl/vatra.gif", 302, 390, 40, null, 2, "fire_sensor")}`)}
 
             <!-- Fan -->
             ${this.conditional(
                 this.values["fan"] == 0,
-                this.createImage("unit/ventilatorStoji-unit.png", 65, 100, 100, null, 5, "fan")
+                this.createImage("biopl/ventilatorStoji-unit.png", 65, 100, 100, null, 5, "fan")
             )}
             ${this.conditional(
                 this.values["fan"] != 0,
-                this.createImage("biotec/fan.gif", 65, 100, 100, null, 6, "fan")
+                this.createImage("biopl/fan.gif", 65, 100, 100, null, 6, "fan")
             )}
 
             <!-- Air flow engine positions -->
@@ -94,11 +94,11 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
             <!-- Pellet dispenzer -->
             ${this.conditional(this.values["pellet_dispenzer"] == 0,
-                this.createImage("unit/dozatorStoji.png", 308, 341, 28, null, 4, ""),
-                this.createImage("unit/dozator_1.gif", 308, 341, 28, null, 4, ""))}
+                this.createImage("biopl/dozatorStoji.png", 308, 341, 28, null, 4, ""),
+                this.createImage("biopl/dozator_1.gif", 308, 341, 28, null, 4, ""))}
 
             <!-- Outdoor temperature -->
-            ${this.createImage("cmpelet/vanjska.png", 890, 30, 20, "auto", "outdoor_temperature")}
+            ${this.createImage("biopl/vanjska.png", 890, 30, 20, "auto", "outdoor_temperature")}
             ${this.createText(this.formatTemperature("outdoor_temperature") + "°C", 24, "color: #ffffff; text-align: right;", 800, 45, 80, null, 3, null, "outdoor_temperature")}
 
             <!-- Boiler temperature  -->
@@ -119,27 +119,27 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             <!-- Glow -->
             ${this.conditional(
                 this.values["glow"] == 1,
-                this.createImage("biotec/glow.png", 65, 435, 100, null, 3, "glow")
+                this.createImage("biopl/glow.png", 65, 435, 100, null, 3, "glow")
             )}
 
             <!-- Pump -->
             ${this.conditional(
                 this.values["boiler_pump_demand"] == 1,
-                this.createImage("peltec/demand_p.png", 443, 492, 12, null, 3, "boiler_pump_demand"),
+                this.createImage("biopl/demand_p.png", 443, 492, 12, null, 3, "boiler_pump_demand"),
                 this.createImage("transparent.png", 443, 492, 12, null, 3, "boiler_pump_demand"))}
             ${this.conditional(
                 this.values["boiler_pump"] == 1,
-                this.createImage("peltec/pumpaokrece.gif", 442, 465, 64, null, 2, "boiler_pump"),
+                this.createImage("biopl/pumpaokrece.gif", 442, 465, 64, null, 2, "boiler_pump"),
                 this.createImage("transparent.png", 442, 465, 64, null, 2, "boiler_pump"))}
 
             <!-- Flue gas temperature -->
             ${this.createText(this.formatTemperature("flue_gas", "--", 1000) + "°C", 28, "color: #FFFFFF;",  5, 15, null, null, 8, null, "flue_gas")}
-            ${this.createImage("peltec/senzor_b_1.png", 120, 34, 40, null, 8)}
+            ${this.createImage("biopl/senzor_b_1.png", 120, 34, 40, null, 8)}
 
             <!-- Oxygen (lambda) sensor -->
             ${this.conditional(
                 "lambda_sensor" in this.values && this.values["lambda_sensor"] > 0.1,
-                html`${this.createImage("peltec/senzor_b_2.png", 75, 35, 40, null, 8)}
+                html`${this.createImage("biopl/senzor_b_2.png", 75, 35, 40, null, 8)}
                      ${this.createText(html`
                         ${this.values["lambda_sensor"] < 25.4 ? this.values["lambda_sensor"] : "-.-"}%`, 28,
                          "color: #ffffff; text-align: center;", 175, 30, null, null, 8, null, "lambda_sensor")}`)}
@@ -157,11 +157,11 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             <!-- Tap/radiator mode -->
             ${this.conditional(
                 "operation_mode" in this.values && (this.values["operation_mode"] == 1),
-                this.createImage("cmpelet/slavina.png", 930, 10, 80, "auto", 2)
+                this.createImage("biopl/slavina.png", 930, 10, 80, "auto", 2)
             )}
             ${this.conditional(
                 "operation_mode" in this.values && (this.values["operation_mode"] == 0 || this.values["operation_mode"] == 2),
-                this.createImage("cmpelet/radijator.png", 930, 10, 80, "auto", 2)
+                this.createImage("biopl/radijator.png", 930, 10, 80, "auto", 2)
             )}
 
             <!-- Boiler State -->
@@ -169,9 +169,9 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
             <!-- Boiiler state icon -->
             ${this.conditional(this.values["boiler_state"] != "OFF",
-                this.createImage("peltec/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
+                this.createImage("biopl/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
                 this.createText("", 32,
-                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "img/start_stop.png?v=0.0.29'); background-position: 0px 0px;",
+                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30'); background-position: 0px 0px;",
                     945, 390, 36, 36, 4, null, "boiler_state"))}
 
             <!-- Buffers -->
@@ -248,11 +248,11 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
                     <!-- Pump -->
                     ${this.conditional(
                         this.values["second_pump_demand"] == 1,
-                        this.dhwBufferArea.createImage("peltec/demand_p.png", 5, 199, 12, null, 6, "second_pump_demand"),
+                        this.dhwBufferArea.createImage("biopl/demand_p.png", 5, 199, 12, null, 6, "second_pump_demand"),
                         this.dhwBufferArea.createImage("transparent.png", 5, 199, 12, null, 6, "second_pump_demand"))}
                     ${this.conditional(
                         this.values["second_pump"] == 1,
-                        this.dhwBufferArea.createImage("peltec/pumpaokrece.gif", 4, 172, 64, null, 5, "second_pump"),
+                        this.dhwBufferArea.createImage("biopl/pumpaokrece.gif", 4, 172, 64, null, 5, "second_pump"),
                         this.dhwBufferArea.createImage("transparent.png", 4, 172, 64, null, 5, "second_pump"))}
             `))
     }

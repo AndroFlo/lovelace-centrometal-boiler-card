@@ -1,6 +1,6 @@
 # lovelace-centrometal-boiler-card
 
-Home assistant lovelace card to support Centrometal (https://www.centrometal.hr/) boiler with WiFi integration into Home Assistant (a free and open-source software for home automation designed to be a central control system for smart home devices with a focus on local control and privacy).
+Home assistant lovelace card to support the Centrometal (https://www.centrometal.hr/) **BioTec Plus** boiler with WiFi integration into Home Assistant (a free and open-source software for home automation designed to be a central control system for smart home devices with a focus on local control and privacy).
 
 ## Installation
 
@@ -22,16 +22,11 @@ The images are loaded from `/local/community/lovelace-centrometal-boiler-card/im
 
 ```
 type: custom:centrometal-boiler-card
-device_type: peltec | cmpelet | biotec | biopl (optional)
 prefix: <prefix> (optional)
 debug: true (optional)
 ```
-device_type:
-Optional parameter, if you have only one boiler the card shall properly detect device type.
-- peltec (PelTec and PelTec Lambda)
-- cmpelet (CentroPlus + Cm Pelet-set, EKO-CK P + Cm Pelet-Set)
-- biotec (BioTec-L)
-- biopl (BioTec Plus)
+
+Only the BioTec Plus is supported. The entities are detected automatically; the former `device_type: biopl` option is still accepted, any other value shows an error.
 
 debug: true (optional)
 Logs every change of the boiler entities to the browser console. Off by default.
@@ -43,65 +38,29 @@ Prefix is optional, if defined when adding device to HA all entities are prefixe
 
 ```
 - type: custom:centrometal-boiler-card
-  device_type: peltec
   prefix: john
 - type: custom:centrometal-boiler-card
-  device_type: cmpelet
-  prefix: mike
-- type: custom:centrometal-boiler-card
-  device_type: biotec
-  prefix: joe
-- type: custom:centrometal-boiler-card
-  device_type: cmpelet
-  prefix: alex
-- type: custom:centrometal-boiler-card
-  device_type: biopl
   prefix: jack
 ```
 
-![Peltec Display Example](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/all-display.gif)
+![BioTec Plus](https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/biotec-plus-display.gif)
 
-## PelTec Lambda
+## Redesign proposals (work in progress)
 
-```
-type: custom:centrometal-boiler-card
-device_type: peltec
-```
+Mock-ups of a more modern UI for the BioTec Plus. They are **not implemented yet**: the card still renders the display shown above. Values are illustrative.
 
-![Peltec Display Example](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/peltec-display.gif)
+| A · Modern synoptic | B · Dashboard | C · Compact card & tile |
+|---|---|---|
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-a-synoptic.png" width="420" alt="Modern synoptic"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-b-dashboard.png" width="220" alt="Dashboard"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-c-compact.png" width="220" alt="Compact card and tile"> |
 
-## Centro Plus + Cm Pelet-set
+### Usage scenarios (modern synoptic)
 
-```
-type: custom:centrometal-boiler-card
-device_type: cmpelet
-```
-
-![CentroPlus](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/cmpelet-display.gif)
-
-## BioTec-L
-
-```
-type: custom:centrometal-boiler-card
-device_type: biotec
-```
-
-![BioTec](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/biotec-display.gif)
-
-## BioTec Plus
-
-```
-type: custom:centrometal-boiler-card
-device_type: biopl
-```
-
-![BioTec Plus](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/biotec-plus-display.gif)
-
-## EKO-CK P + Cm Pelet-set
-```
-type: custom:centrometal-boiler-card
-device_type: cmpelet
-```
-
-![EKO-CK P](https://github.com/9a4gl/lovelace-centrometal-boiler-card/raw/main/eko-ckp-display.gif)
-
+| | |
+|---|---|
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-01-off.png" width="420" alt="Off"><br>Off | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-02-ignition.png" width="420" alt="Ignition in progress"><br>Ignition in progress |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-03-stabilisation.png" width="420" alt="Stabilisation"><br>Stabilisation | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-04-running.png" width="420" alt="Heating — pump P1 running"><br>Heating — pump P1 running |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-05-dhw.png" width="420" alt="DHW charging — pump P2 running"><br>DHW charging — pump P2 running | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-06-wood.png" width="420" alt="Wood mode"><br>Wood mode |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-07-takeover.png" width="420" alt="Take-over wood → pellets"><br>Take-over wood → pellets | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-08-extinction.png" width="420" alt="Extinction / post-ventilation"><br>Extinction / post-ventilation |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-09-reserve.png" width="420" alt="Pellet reserve reached"><br>Pellet reserve reached | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-10-empty.png" width="420" alt="Pellet silo empty"><br>Pellet silo empty |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-11-locked.png" width="420" alt="Boiler access disabled"><br>Boiler access disabled | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-12-fault.png" width="420" alt="Fault"><br>Fault |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-13-unavailable.png" width="420" alt="Boiler unavailable"><br>Boiler unavailable | |
