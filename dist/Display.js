@@ -1,4 +1,4 @@
-import { DisplayArea } from "./DisplayArea.js?v=0.0.27"
+import { DisplayArea } from "./DisplayArea.js?v=0.0.28"
 
 export class Display extends DisplayArea {
 
@@ -33,9 +33,9 @@ export class Display extends DisplayArea {
             this.parameters[name] = this.config[name];
             return this.config[name];
         }
-        if (alternative_name in this.config) {
+        if (alternative_name !== null && alternative_name in this.config) {
             this.parameters[name] = this.config[alternative_name];
-            return this.config[name];
+            return this.config[alternative_name];
         }
         for (const property in this.card.hass.states) {
             if (property.startsWith(starts_with) && property.endsWith(name)) {
@@ -43,10 +43,12 @@ export class Display extends DisplayArea {
                 return property;
             }
         }
-        for (const property in this.card.hass.states) {
-            if (property.startsWith(starts_with) && property.endsWith(alternative_name)) {
-                this.parameters[name] = property;
-                return property;
+        if (alternative_name !== null) {
+            for (const property in this.card.hass.states) {
+                if (property.startsWith(starts_with) && property.endsWith(alternative_name)) {
+                    this.parameters[name] = property;
+                    return property;
+                }
             }
         }
 
@@ -65,7 +67,8 @@ export class Display extends DisplayArea {
     updateParameterValues(hass) {
         this.values = {}
         for (const [key, value] of Object.entries(this.parameters)) {
-            this.values[key] = hass.states[value].state
+            // Entity may have been removed/renamed since the card was configured
+            this.values[key] = (value in hass.states) ? hass.states[value].state : "unavailable"
             if (this.values[key] == "unavailable") {
                 this.values[key] = "-"
             }

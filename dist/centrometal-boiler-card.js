@@ -3,10 +3,10 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { PelTecDisplay } from "./PelTec.js?v=0.0.27"
-import { CmPeletDisplay } from "./CmPelet.js?v=0.0.27"
-import { BioTecDisplay } from "./BioTec.js?v=0.0.27"
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.27"
+import { PelTecDisplay } from "./PelTec.js?v=0.0.28"
+import { CmPeletDisplay } from "./CmPelet.js?v=0.0.28"
+import { BioTecDisplay } from "./BioTec.js?v=0.0.28"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.28"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -26,7 +26,8 @@ class LovelaceCentrometalBoilerCard extends LitElement {
         this.height = entry.contentRect.height
         // console.log("Size ", this.width, "x", this.height)
       })
-    }).observe(this)
+    })
+    this.observer.observe(this)
   }
 
   static get properties() {
@@ -116,9 +117,30 @@ class LovelaceCentrometalBoilerCard extends LitElement {
     return 3;
   }
 
+  // Sections dashboard: full width, height follows the background image
+  getGridOptions() {
+    return {
+      columns: "full",
+      min_columns: 6,
+    };
+  }
+
+  static getStubConfig() {
+    return {};
+  }
+
 }
 
 customElements.define('centrometal-boiler-card', LovelaceCentrometalBoilerCard);
+
+// Show the card in the dashboard "Add card" picker
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "centrometal-boiler-card",
+  name: "Centrometal Boiler Card",
+  description: "Display of Centrometal boilers (PelTec, CM Pelet-set, BioTec-L, BioTec Plus)",
+  documentationURL: "https://github.com/AndroFlo/lovelace-centrometal-boiler-card",
+});
 
 console.info(
   `%c centrometal-boiler-card %c`,
