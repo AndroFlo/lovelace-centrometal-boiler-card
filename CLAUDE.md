@@ -30,7 +30,7 @@ The entry file also registers the card in `window.customCards` (card picker) and
 2. First `render` → `configureDisplay()`: if `device_type` is missing it is auto-detected from a `sensor.*_device_type` entity. Accepted values: `peltec`, `cmpelet`/`cm_pelet`, `biotec`, `biopl`.
 3. Each boiler's `configureDisplay()` calls `configureParameter(...)` for every entity, then creates its `DisplaySubArea`s. If it returns a **string**, that string is shown as an error in the card.
 4. Every `render` → `createContent(hass)`: `updateParameterValues` fills `this.values[name]` (HA state, `"unavailable"` or missing entity → `"-"`), then returns an `html` template stacking images and texts over a background PNG.
-5. `shouldUpdate` only re-renders when a tracked entity changed (logged to the console) or the card height changed.
+5. `shouldUpdate` only re-renders when a tracked entity changed or the card height changed. Changes are logged to the console only with `debug: true` in the card config.
 
 ### `configureParameter(starts_with, name, opt, value_if_missing)` (Display.js)
 - Picks the first entity that **starts with** `starts_with` (e.g. `sensor.cm_pelet`, with `prefix` injected: `sensor.<prefix>_cm_pelet`) and **ends with** `name`.
@@ -51,16 +51,16 @@ The entry file also registers the card in `window.customCards` (card picker) and
 
 ## Per-boiler specifics
 - **PelTec**: optional blocks depend on `configuration` (string containing `BUF`, `DHW`, …).
-- **CmPelet**: the hydraulic layout depends on `setup` (`A.0.0`, `A.0.1`, `A.0.2`, `I.7.0`) — one `createSubArea` block per setup (all in `a02area`). The boiler picture depends on `firmware_version` (**lexicographic** string comparison, e.g. `> 'v1.25'`), `centroplus` and `b_smd` (0 = pellets, 1 = wood).
+- **CmPelet**: the hydraulic layout depends on `setup` (`A.0.0`, `A.0.1`, `A.0.2`, `I.7.0`) — `createSetup()` picks the block for the setup and composes it from `createBufferTank()` and `createHeatingCircuit(x, ...)` in `setupArea`; add a new setup as a new `case` there. The boiler picture depends on `firmware_version`, `centroplus` and `b_smd` (0 = pellets, 1 = wood). Firmware checks are computed once at the top of `createContent` (`fwBefore125`, `fw125`, …) as **lexicographic** string comparisons: that is deliberate, since it's unknown whether Centrometal versions are decimal (v1.3 = v1.30) or semver.
 - **BioTec**: blocks driven by bits of `configuration` (`conf_bit_*` sub-areas, `hexBitIsSet/Clear` helpers).
 
 ## Conventions
-- **Cache-busting version**: every import and image URL carries `?v=0.0.28` (21 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.28' dist`), otherwise browsers mix stale cached modules with new ones.
+- **Cache-busting version**: every import and image URL carries `?v=0.0.29` (21 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.29' dist`), otherwise browsers mix stale cached modules with new ones.
 - Existing style: 4-space indent (2 in `centrometal-boiler-card.js`), inconsistent semicolons, HTML comments `<!-- Section -->` to split templates. Stay consistent with the file being edited; duplication between setups is accepted (copy the closest neighbouring block and adjust coordinates).
 - Commands: `turn_on`/`turn_off` on the `switch.<type>*boiler_switch` entity via `root.hass.callService`.
 - Document any new boiler type/option in `README.md` (YAML example + demo GIF at repo root).
 
 ## Release (HACS)
 1. Bump the `?v=` version in `dist/` and commit on `main`.
-2. Create a GitHub release with a tag equal to that version (e.g. `0.0.28`). HACS offers releases as versions; without any release it installs the latest `main` commit.
+2. Push a tag equal to that version (`git tag 0.0.30 && git push origin 0.0.30`). `.github/workflows/release.yml` checks that every `?v=` in `dist/` matches the tag, then publishes the GitHub release, which HACS offers as a version.
 3. HACS validation needs the GitHub repo to have a description, topics and issues enabled.

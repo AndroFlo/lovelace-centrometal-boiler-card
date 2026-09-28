@@ -1,4 +1,4 @@
-import { DisplayArea } from "./DisplayArea.js?v=0.0.28"
+import { DisplayArea } from "./DisplayArea.js?v=0.0.29"
 
 export class Display extends DisplayArea {
 
@@ -10,6 +10,7 @@ export class Display extends DisplayArea {
         this.values = {}
         this.values_if_missing = {}
         this.card_id = "id_" + Math.random().toString(16).slice(2)
+        this.debug = this.config["debug"] === true
         this.prefix = ""
         if ("prefix" in this.config) {
             this.prefix = this.config["prefix"]
@@ -83,6 +84,9 @@ export class Display extends DisplayArea {
         const oldValue = oldHass.states[entity];
         const newValue = hass.states[entity];
         if (oldValue != newValue) {
+            if (!this.debug) {
+                return true;
+            }
             var currentdate = new Date();
             const zeroPad = (num, places) => String(num).padStart(places, '0')
             var datetime = zeroPad(currentdate.getHours(), 2) + ":"  + zeroPad(currentdate.getMinutes(), 2) + ":" + zeroPad(currentdate.getSeconds(), 2);

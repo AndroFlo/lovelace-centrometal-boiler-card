@@ -24,6 +24,7 @@ The images are loaded from `/local/community/lovelace-centrometal-boiler-card/im
 type: custom:centrometal-boiler-card
 device_type: peltec | cmpelet | biotec | biopl (optional)
 prefix: <prefix> (optional)
+debug: true (optional)
 ```
 device_type:
 Optional parameter, if you have only one boiler the card shall properly detect device type.
@@ -31,6 +32,9 @@ Optional parameter, if you have only one boiler the card shall properly detect d
 - cmpelet (CentroPlus + Cm Pelet-set, EKO-CK P + Cm Pelet-Set)
 - biotec (BioTec-L)
 - biopl (BioTec Plus)
+
+debug: true (optional)
+Logs every change of the boiler entities to the browser console. Off by default.
 
 prefix: <prefix>
 Prefix is optional, if defined when adding device to HA all entities are prefixed with it. Here you can define the prefix for boiler entities. This is usefull if you add several boilers into system to distinguish entities per boiler.

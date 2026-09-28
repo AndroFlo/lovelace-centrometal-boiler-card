@@ -2,8 +2,8 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.28"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.28"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.29"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.29"
 
 export class PelTecDisplay extends DisplayWithPowerButton {
 
@@ -84,7 +84,7 @@ export class PelTecDisplay extends DisplayWithPowerButton {
                 (("fan" in this.values && this.values["fan"] == 5000) ? "MAX" : "")
                 , 20, "color: #000000;", 140, 255, null, null, 2, null, "fan")}
 
-            <!- Pump -->
+            <!-- Pump -->
             ${this.conditional(this.values["boiler_pump"] == 0,
                 this.createImage("peltec/pumpaStojiLijevo.png", 345, 212, 66, null, 2, "boiler_pump"))}
             ${this.conditional(this.values["boiler_pump"] == 1,
@@ -163,7 +163,7 @@ export class PelTecDisplay extends DisplayWithPowerButton {
                     ${this.dhwBufferArea.createText(
                         this.formatTemperature("domestic_hot_water") + " °C", 32, "color: #0000ff; text-align: center;",
                         48, 133, null, null, 4, null, "domestic_hot_water")}
-                        <!- Pump -->
+                        <!-- Pump -->
                         ${this.conditional(
                             this.values["second_pump_demand"] == 1,
                             this.dhwBufferArea.createImage("peltec/demand_p.png", 5, 199, 12, null, 6, "second_pump_demand"),
@@ -196,7 +196,7 @@ export class PelTecDisplay extends DisplayWithPowerButton {
             ${this.conditional(
                 this.values["boiler_state"] === "OFF",
                 this.createText("", 32,
-                "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "peltec/start_stop.png?v=0.0.28'); background-position: 0px 0px;",
+                "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "peltec/start_stop.png?v=0.0.29'); background-position: 0px 0px;",
                 945, 390, 36, 36, 2, -1))}
             ${this.conditional(
                 this.values["command_active"] == 0 && this.values["boiler_state"] !== "OFF",
