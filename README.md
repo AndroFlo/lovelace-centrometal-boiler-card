@@ -22,11 +22,21 @@ The images are loaded from `/local/community/lovelace-centrometal-boiler-card/im
 
 ```
 type: custom:centrometal-boiler-card
+layout: synoptic | dashboard | compact | tile | classic (optional, default synoptic)
 prefix: <prefix> (optional)
 debug: true (optional)
 ```
 
 Only the BioTec Plus is supported. The entities are detected automatically; the former `device_type: biopl` option is still accepted, any other value shows an error.
+
+layout: (optional)
+- `synoptic` (default): modern schematic of the boiler — wood and pellet chambers, live flames, pumps and water flows, buffer and DHW tanks coloured by temperature, combustion / air panel. Scales with the card width, best in a full-width card.
+- `dashboard`: tiles following the Home Assistant theme (light or dark), for a half-width column.
+- `compact`: boiler temperature, state, buffer bar and key values.
+- `tile`: a single line for sections dashboards.
+- `classic`: the original Centrometal display.
+
+Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled in wood mode and when access to the boiler is disabled.
 
 debug: true (optional)
 Logs every change of the boiler entities to the browser console. Off by default.
@@ -43,17 +53,27 @@ Prefix is optional, if defined when adding device to HA all entities are prefixe
   prefix: jack
 ```
 
+| `synoptic` | `synoptic` (wood mode) |
+|---|---|
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-synoptic.png" width="420" alt="Synoptic layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-synoptic-wood.png" width="420" alt="Synoptic layout in wood mode"> |
+
+| `dashboard` | `compact` and `tile` |
+|---|---|
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-dashboard.png" width="300" alt="Dashboard layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-compact.png" width="300" alt="Compact layout"><br><img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-tile.png" width="300" alt="Tile layout"> |
+
+`classic` layout:
+
 ![BioTec Plus](https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/biotec-plus-display.gif)
 
-## Redesign proposals (work in progress)
+## Design mock-ups
 
-Mock-ups of a more modern UI for the BioTec Plus. They are **not implemented yet**: the card still renders the display shown above. Values are illustrative.
+The mock-ups the layouts above were built from. Values are illustrative; the phase timeline at the bottom of the scenarios is not implemented (it needs the list of Centrometal `boiler_state` codes).
 
 | A · Modern synoptic | B · Dashboard | C · Compact card & tile |
 |---|---|---|
 | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-a-synoptic.png" width="420" alt="Modern synoptic"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-b-dashboard.png" width="220" alt="Dashboard"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-c-compact.png" width="220" alt="Compact card and tile"> |
 
-### Usage scenarios (modern synoptic)
+### Usage scenarios (synoptic)
 
 | | |
 |---|---|

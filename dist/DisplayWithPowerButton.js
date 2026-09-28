@@ -2,7 +2,7 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { Display } from "./Display.js?v=0.0.30-beta.1"
+import { Display } from "./Display.js?v=0.0.30-beta.2"
 
 export class DisplayWithPowerButton extends Display {
 
