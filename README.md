@@ -2,6 +2,24 @@
 
 Home assistant lovelace card to support Centrometal (https://www.centrometal.hr/) boiler with WiFi integration into Home Assistant (a free and open-source software for home automation designed to be a central control system for smart home devices with a focus on local control and privacy).
 
+## Installation
+
+### HACS (custom repository)
+
+1. In Home Assistant open **HACS**, click the three dots menu (top right) and choose **Custom repositories**.
+2. Add `https://github.com/AndroFlo/lovelace-centrometal-boiler-card` with type **Dashboard** (called **Lovelace** / **Plugin** in older HACS versions).
+3. Search for **Centrometal Boiler Display Card**, click **Download** and reload the browser when asked.
+4. HACS registers the dashboard resource automatically (`/hacsfiles/lovelace-centrometal-boiler-card/centrometal-boiler-card.js`).
+
+### Manual
+
+1. Copy the content of the `dist` folder to `<config>/www/community/lovelace-centrometal-boiler-card/`.
+2. Add a dashboard resource (**Settings → Dashboards → ⋮ → Resources**): URL `/local/community/lovelace-centrometal-boiler-card/centrometal-boiler-card.js`, type **JavaScript module**.
+
+The images are loaded from `/local/community/lovelace-centrometal-boiler-card/images/`, so keep this folder name.
+
+## Configuration
+
 ```
 type: custom:centrometal-boiler-card
 device_type: peltec | cmpelet | biotec | biopl (optional)
