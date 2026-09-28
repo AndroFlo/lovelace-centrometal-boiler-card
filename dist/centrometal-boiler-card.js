@@ -3,7 +3,7 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.1"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.2"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -40,19 +40,23 @@ class LovelaceCentrometalBoilerCard extends LitElement {
     return {
       width: Number,
       height: Number,
+      uiTick: Number,     // bumped by the display for local UI changes (power confirmation)
       hass: {},
       config: {},
     };
   }
 
   shouldUpdate(changedProperties) {
-    if (changedProperties.has("height")) {
+    if (!this.hass) {
+      return false;
+    }
+    if (this.display === null) {
+      return true; // first render configures the display
+    }
+    if (changedProperties.has("height") || changedProperties.has("width") || changedProperties.has("uiTick")) {
       return true;
     }
     if (changedProperties.has("hass")) {
-      if (this.display === null) {
-          return false
-      }
       if (typeof this.display === 'string' || this.display instanceof String) {
         return false;
       }
@@ -95,16 +99,23 @@ class LovelaceCentrometalBoilerCard extends LitElement {
   }
 
   // Masonry view: one unit is ~50px, the card is ~0.55 x its width high
-  getCardSize() {
-    return 6;
+  layoutName() {
+    return ((this.config && this.config["layout"]) || "synoptic").toString().toLowerCase();
   }
 
-  // Sections dashboard: full width, height follows the background image
+  getCardSize() {
+    return { dashboard: 12, compact: 4, tile: 1 }[this.layoutName()] || 6;
+  }
+
+  // Sections dashboard: the synoptic and classic displays take the full width, the other layouts half of it
   getGridOptions() {
-    return {
-      columns: "full",
-      min_columns: 6,
-    };
+    switch (this.layoutName()) {
+      case "dashboard":
+      case "compact":
+      case "tile":
+        return { columns: 6, min_columns: 4 };
+    }
+    return { columns: "full", min_columns: 6 };
   }
 
   static getStubConfig() {

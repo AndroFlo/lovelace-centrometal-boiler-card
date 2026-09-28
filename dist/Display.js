@@ -1,4 +1,4 @@
-import { DisplayArea } from "./DisplayArea.js?v=0.0.30-beta.1"
+import { DisplayArea } from "./DisplayArea.js?v=0.0.30-beta.2"
 
 export class Display extends DisplayArea {
 
