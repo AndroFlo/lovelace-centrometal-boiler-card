@@ -54,12 +54,14 @@ The entry file also registers the card in `window.customCards` (card picker) and
 ### Modern layouts (`BioTecPlusModern.js`)
 - `layout` other than `classic` → `BioTecPlusDisplay.createContent` returns `modern.render(layout)`. `model()` turns `this.values` into display data (all rules in one place); `synoptic()`, `dashboard()`, `compact()`, `tile()` only render it. Inline SVG fragments inserted inside an `<svg>` must use lit's `svg` tag, not `html`.
 - The synoptic is drawn at a fixed 960x600 and scaled with `transform: scale(card.width / 960)`; that's why the card re-renders on `width` changes. The other layouts are fluid and use the HA theme variables (`--primary-text-color`, `--ha-card-background`, …).
-- Heuristics (not Centrometal rules): pellet flame when `fire_sensor` < 1000 kΩ, bigger when lower; wood flame from `firebox_temperature` in wood mode; glow = braise.
+- Geometry, palette and thresholds come from the design kit (`biotec-ui.zip`: `docs/specification.md`, `data/tokens.json`, `design/Synoptic.dc.html`): 960x600 canvas, 616x436 schematic at 24,118, flame `clamp(firebox / 400, .22, 1)`, firebox yellow above 300 °C, smoke above 80 °C, orange chimney above 100 °C, tank/radiator colour interpolated #2f78b8 -> #e9803a over 25-70 °C.
+- Not in the kit, because no entity carries them: fan speed stays `b_fan` in %, not rpm; there is no DHW setpoint; the phase strip shows the state text, since the Centrometal `b_state` codes are unknown.
+- The pellet burner is lit when `fire_sensor` < 1000 kΩ; `firebox_temperature` is a single sensor, so its label sits under the chamber in use.
 - The power confirmation is local UI state: `modern.confirm` + bump `card.uiTick` to force a render (`shouldUpdate` otherwise only reacts to tracked entities).
 - Testing without HA: serve the repo root over HTTP and load the card in a page with a mock `hass` (`{states: {"sensor.biotec_boiler_state": {state: "ON", attributes: {}}, ...}, callService}`) and a stub `ha-card` element; screenshot with headless Chrome.
 
 ## Conventions
-- **Cache-busting version**: every import and image URL carries `?v=0.0.30-beta.2` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30-beta.2' dist`), otherwise browsers mix stale cached modules with new ones.
+- **Cache-busting version**: every import and image URL carries `?v=0.0.30-beta.3` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30-beta.3' dist`), otherwise browsers mix stale cached modules with new ones.
 - Existing style: 4-space indent (2 in `centrometal-boiler-card.js`), inconsistent semicolons, HTML comments `<!-- Section -->` to split templates. Stay consistent with the file being edited; duplication between blocks is accepted (copy the closest neighbouring block and adjust coordinates).
 - Commands: `turn_on`/`turn_off` on the `switch.biotec*boiler_switch` entity via `root.hass.callService`.
 - Document any new option in `README.md` (YAML example; demo GIF `biotec-plus-display.gif` at repo root). `docs/images/` holds screenshots of the redesign mock-ups shown in the README (outside `dist/`, so HACS does not ship them).

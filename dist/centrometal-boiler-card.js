@@ -3,7 +3,7 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.2"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.3"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
