@@ -247,6 +247,8 @@ export class BioTecPlusModern {
         let stepsNote = ""
         if (unavailable) {
             phase = -1
+        } else if (wood && take == 1) {
+            stepsNote = "Prise en charge par les granulés — en attente de la fin du feu de bois"
         } else if (wood) {
             stepsNote = d.config["allow_power_in_wood"] === true ? "Mode bois — le bouton commande la régulation, pas le feu" : "Mode bois — la marche/arrêt se fait sur la chaudière"
         } else if (off) {
@@ -830,7 +832,8 @@ export class BioTecPlusModern {
                         <div class="${m.wood ? "on" : ""} click" @click=${this.info("boiler_temperature_wood")}>Bois · ${show(m.tw, "°")}</div>
                         ${m.pelletEnabled ? html`
                             <div class="click" style="outline: 1px dashed var(--cb-heat); outline-offset: -1px;" title="Passer en granulés" @click=${() => this.askPellet(m)}>Passer en granulés</div>` : html`
-                            <div class="${m.wood ? "" : "on"} click" @click=${this.info("boiler_temperature_pellet")}>Granulés · ${show(m.tb, "°")}</div>`}
+                            <div class="${m.wood ? "" : "on"} click" style="${m.wood && m.take == 1 ? "color: var(--cb-heat); font-weight: 600;" : ""}"
+                                @click=${this.info(m.wood && m.take == 1 ? "take_over" : "boiler_temperature_pellet")}>${m.wood && m.take == 1 ? "Prise en charge…" : "Granulés · " + show(m.tb, "°")}</div>`}
                     </div>
                     ${m.hasOutdoor ? html`<div class="kv click" @click=${this.info("outdoor_temperature")}><span>Extérieur</span><span>${show(m.outdoor, " °C")}</span></div>` : ""}
                     ${m.hasRoom ? html`<div class="kv click" @click=${this.info("circuit_1_room_measured_temperature")}><span>Maison</span><span>${show(m.room, " °C")}${m.roomSet !== null ? " / " + m.roomSet + " °C" : ""}</span></div>` : ""}
