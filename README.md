@@ -52,6 +52,8 @@ wood_door: binary_sensor.boiler_door
 domestic_hot_water_target: sensor.dhw_setpoint
 ```
 
+The Bois / Granulés indicator at the top of the synoptic shows the active source only: the Centrometal integration has no command to switch between wood and pellets, this is done on the boiler.
+
 Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled when access to the boiler is disabled (`control_mode` 2).
 
 allow_power_in_wood: (optional, off by default)

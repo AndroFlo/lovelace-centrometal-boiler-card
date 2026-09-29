@@ -85,10 +85,10 @@ const STYLE = html`<style>
     .syn .top { left: 24px; right: 24px; top: 18px; height: 48px; display: flex; align-items: center; gap: 12px; }
     .syn .chip { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #1a2529; border: 1px solid #2a383e; font-size: 13px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .syn .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .syn .src { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0e1417; border: 1px solid #2a383e; flex-shrink: 0; }
-    .syn .src button { height: 36px; padding: 0 14px; border-radius: 9px; border: none; background: transparent; color: #a9b6bb; font-size: 13px; font-weight: 600; cursor: pointer; }
-    .syn .src button.on { background: #f08a3c; color: #1b1107; }
-    .syn .src button.busy { background: #3a2616; color: #ffc98f; }
+    .syn .src { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0e1417; border: 1px solid #2a383e; flex-shrink: 0; cursor: default; }
+    .syn .src > span { height: 36px; display: flex; align-items: center; padding: 0 14px; border-radius: 9px; color: #6d7d83; font-size: 13px; font-weight: 600; }
+    .syn .src > .on { background: #f08a3c; color: #1b1107; }
+    .syn .src > .busy { background: #3a2616; color: #ffc98f; }
     .syn .pw { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; flex-shrink: 0; }
     .syn .pw.on { border: 1.5px solid #f08a3c; background: #231a14; }
     .syn .pw.off { width: auto; padding: 0 16px 0 12px; gap: 8px; border-radius: 22px; border: 1.5px solid #6fd08c; background: #13241a; color: #b8f0c8; font-size: 14px; font-weight: 600; }
@@ -465,10 +465,11 @@ export class BioTecPlusModern {
                         <span class="num" style="font-size: 18px; color: #e7ecee;">${show(m.outdoor, " °C")}</span>
                         <span>ext.</span>
                     </div>` : ""}
-                <div class="src" role="group" aria-label="Source de chauffe">
-                    <button type="button" class="${m.wood && !takeBusy ? "on" : ""}" aria-pressed="${m.wood ? "true" : "false"}" @click=${this.info("wood_pellet_mode")}>Bois</button>
-                    <button type="button" class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}" aria-pressed="${m.wood ? "false" : "true"}"
-                        @click=${this.info(m.wood ? "take_over" : "wood_pellet_mode")}>${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</button>
+                <!-- Source indicator: the integration has no command to switch wood / pellets, it is done on the boiler -->
+                <div class="src" role="status" aria-label="Source de chauffe : ${m.wood ? "bois" : "granulés"}"
+                    title="Source de chauffe (le passage bois / granulés se fait sur la chaudière)">
+                    <span class="${m.wood && !takeBusy ? "on" : ""}">Bois</span>
+                    <span class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}">${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</span>
                 </div>
                 ${this.synopticPower(m)}
             </div>

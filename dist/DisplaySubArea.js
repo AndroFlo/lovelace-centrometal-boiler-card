@@ -2,7 +2,7 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplayArea } from "./DisplayArea.js?v=0.0.30-beta.5"
+import { DisplayArea } from "./DisplayArea.js?v=0.0.30-beta.6"
 
 export class DisplaySubArea extends DisplayArea {
 
