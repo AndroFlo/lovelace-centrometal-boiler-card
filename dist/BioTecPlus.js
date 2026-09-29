@@ -2,9 +2,9 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30-beta.4"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30-beta.4"
-import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.30-beta.4"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30-beta.5"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30-beta.5"
+import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.30-beta.5"
 
 export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
@@ -45,13 +45,14 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             this.configureParameter("sensor.biotec", "second_pump|b_p2", "optional")
             this.configureParameter("sensor.biotec", "second_pump_demand|b_zahp2", "optional")
             this.configureParameter("sensor.biotec", "domestic_hot_water|b_tptv1", "optional")
+            this.configureParameter("sensor.biotec", "domestic_hot_water_target", "optional")
             this.configureParameter("sensor.biotec", "third_pump|b_p3", "optional")
             this.configureParameter("sensor.biotec", "third_pump_demand|b_zahp3", "optional")
-            // Heating circuit 1: radiator flow and room thermostat
             this.configureParameter("sensor.biotec", "circuit_1_flow_measured_temperature|c1b_tpol1", "optional")
             this.configureParameter("sensor.biotec", "circuit_1_flow_target_temperature|c1b_tpol", "optional")
             this.configureParameter("sensor.biotec", "circuit_1_room_measured_temperature|c1b_tsob1", "optional")
             this.configureParameter("sensor.biotec", "circuit_1_room_target_temperature|c1b_tsob", "optional")
+            this.configureParameter("sensor.biotec", "wood_door", "optional")
 
             // Service
             this.configureParameter("switch.biotec", "boiler_switch")
@@ -186,7 +187,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             ${this.conditional(this.values["boiler_state"] != "OFF",
                 this.createImage("biopl/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
                 this.createText("", 32,
-                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30-beta.4'); background-position: 0px 0px;",
+                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30-beta.5'); background-position: 0px 0px;",
                     945, 390, 36, 36, 4, null, "boiler_state"))}
 
             <!-- Buffers -->
