@@ -24,6 +24,7 @@ The images are loaded from `/local/community/lovelace-centrometal-boiler-card/im
 type: custom:centrometal-boiler-card
 layout: synoptic | dashboard | compact | tile | classic (optional, default synoptic)
 prefix: <prefix> (optional)
+allow_power_in_wood: true (optional)
 debug: true (optional)
 ```
 
@@ -38,7 +39,10 @@ layout: (optional)
 
 The radiator, the room thermostat and P3 are drawn only when the matching entities exist (heating circuit 1: `c1b_tpol1`, `c1b_tpol`, `c1b_tsob1`, `c1b_tsob`; third pump: `b_p3`, `b_zahp3`). Fan speed is shown as the percentage reported by `b_fan`, and there is no DHW setpoint entity, so none is displayed.
 
-Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled in wood mode and when access to the boiler is disabled.
+Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled when access to the boiler is disabled (`control_mode` 2).
+
+allow_power_in_wood: (optional, off by default)
+In wood mode the power button is disabled, because `switch.<prefix>biotec_boiler_switch` drives the controller and not the wood fire itself: switching it off does not put the fire out. Set this to `true` to enable the button anyway; the confirmation then says so explicitly.
 
 debug: true (optional)
 Logs every change of the boiler entities to the browser console. Off by default.

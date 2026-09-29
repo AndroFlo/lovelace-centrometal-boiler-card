@@ -313,7 +313,11 @@ export class BioTecPlusModern {
             take: take,
             takeAllowed: wood && controlMode == 1,
             locked: locked,
-            powerEnabled: !unavailable && !wood && !locked && ("boiler_switch" in d.parameters),
+            // In wood mode the boiler switch drives the controller, not the wood fire itself,
+            // so the button stays disabled unless the card config opts in.
+            powerEnabled: !unavailable && !locked && ("boiler_switch" in d.parameters)
+                && (!wood || d.config["allow_power_in_wood"] === true),
+            powerInWood: wood && d.config["allow_power_in_wood"] === true,
             banner: banner,
         }
     }
@@ -375,6 +379,12 @@ export class BioTecPlusModern {
     }
 
     confirmText(m) {
+        if (m.powerInWood) {
+            // The switch drives the controller; the wood fire itself keeps burning
+            return m.off
+                ? "Allumer la régulation ? La chaudière est en mode bois."
+                : "Éteindre la régulation ? Le feu de bois, lui, continue de brûler."
+        }
         return m.off ? "Allumer la chaudière ?" : "Éteindre la chaudière ?"
     }
 
@@ -681,7 +691,7 @@ export class BioTecPlusModern {
     synopticPower(m) {
         if (!m.powerEnabled) {
             return html`
-                <button type="button" class="pw dis" disabled title="${m.wood ? "Mode bois : commande sur la chaudière" : "Commande indisponible"}" aria-label="Commande indisponible">
+                <button type="button" class="pw dis" disabled title="${m.wood ? "Mode bois : commande sur la chaudière (option allow_power_in_wood pour l'activer)" : "Commande indisponible"}" aria-label="Commande indisponible">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#56666c" stroke-width="2" stroke-linecap="round">${POWER_ICON}</svg>
                 </button>`
         }

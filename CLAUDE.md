@@ -24,7 +24,7 @@ centrometal-boiler-card.js   LitElement <centrometal-boiler-card>, always builds
 The entry file also registers the card in `window.customCards` (card picker) and provides `getGridOptions` (sections dashboards) and `getStubConfig`.
 
 ### Lifecycle
-1. `setConfig` copies the YAML config (`layout`, `prefix`, `debug`, optional per-entity overrides).
+1. `setConfig` copies the YAML config (`layout`, `prefix`, `debug`, `allow_power_in_wood`, optional per-entity overrides).
 2. First `render` → `configureDisplay()`: `device_type` is optional and kept for older configs; any value other than `biopl` shows an error.
 3. `BioTecPlusDisplay.configureDisplay()` calls `configureParameter(...)` for every entity, then creates its `DisplaySubArea`s. If it returns a **string**, that string is shown as an error in the card.
 4. Every `render` → `createContent(hass)`: `updateParameterValues` fills `this.values[name]` (HA state, `"unavailable"` or missing entity → `"-"`), then returns an `html` template stacking images and texts over a background PNG.
@@ -49,7 +49,7 @@ The entry file also registers the card in `window.customCards` (card picker) and
 
 ## BioTec Plus specifics
 - Blocks driven by bits of `configuration` (`b_konf`) via `hexBitIsSet/Clear`: bit 11 clear = buffer tank shown, bit 5 set = DHW tank shown.
-- `wood_pellet_mode` (**0 = wood**, 1 = pellets) shades the inactive chamber and disables the power button in wood mode; `control_mode` 2 = access to the boiler disabled; `take_over` (0/1/2) is only selectable in pellet mode with `control_mode` 1.
+- `wood_pellet_mode` (**0 = wood**, 1 = pellets) shades the inactive chamber and disables the power button in wood mode (unless `allow_power_in_wood: true`, since the switch drives the controller, not the fire); `control_mode` 2 = access to the boiler disabled; `take_over` (0/1/2) is only selectable in pellet mode with `control_mode` 1.
 
 ### Modern layouts (`BioTecPlusModern.js`)
 - `layout` other than `classic` → `BioTecPlusDisplay.createContent` returns `modern.render(layout)`. `model()` turns `this.values` into display data (all rules in one place); `synoptic()`, `dashboard()`, `compact()`, `tile()` only render it. Inline SVG fragments inserted inside an `<svg>` must use lit's `svg` tag, not `html`.
