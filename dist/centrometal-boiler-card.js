@@ -3,7 +3,7 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.4"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.30-beta.5"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -104,7 +104,7 @@ class LovelaceCentrometalBoilerCard extends LitElement {
   }
 
   getCardSize() {
-    return { dashboard: 12, compact: 4, tile: 1 }[this.layoutName()] || 6;
+    return { dashboard: 12, compact: 5, tile: 1, classic: 6 }[this.layoutName()] || 9;
   }
 
   // Sections dashboard: the synoptic and classic displays take the full width, the other layouts half of it
