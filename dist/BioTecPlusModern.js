@@ -370,6 +370,20 @@ export class BioTecPlusModern {
                     <span>${m.banner.text}</span>
                 </div>` : "")}
 
+            <!-- Flue gas and fan, above the boiler on the left -->
+            ${this.confirm || m.banner ? "" : html`
+                <div class="abs" style="left: 24px; top: 76px; height: 34px; display: flex; align-items: center; gap: 22px;">
+                    <div class="click" style="display: flex; align-items: baseline; gap: 7px;" @click=${this.info("flue_gas")}>
+                        <span style="font-size: 12px; color: #8e9ea4;">Fumées</span>
+                        <span style="font-size: 19px; font-weight: 600;">${show(m.flue, " °C")}</span>
+                    </div>
+                    <div class="click" style="display: flex; align-items: center; gap: 7px;" @click=${this.info("fan")}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${m.fan ? "#4aa3df" : "#56666c"}" stroke-width="2" stroke-linecap="round"><g class="${m.fan ? "spin" : ""}">${FAN_ICON}</g></svg>
+                        <span style="font-size: 12px; color: #8e9ea4;">Ventilateur</span>
+                        <span style="font-size: 19px; font-weight: 600;">${m.fanText}</span>
+                    </div>
+                </div>`}
+
             <!-- Schematic -->
             <svg class="abs" width="616" height="436" viewBox="0 0 616 436" style="left: 24px; top: 118px;">
                 <defs>
@@ -394,6 +408,20 @@ export class BioTecPlusModern {
                     <rect x="30" y="80" width="76" height="110" rx="8" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
                     <rect x="30" y="300" width="76" height="40" rx="6" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
                     <rect x="30" y="352" width="76" height="44" rx="6" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
+                </g>
+
+                <!-- Firebox temperature (A) and wood air flaps (B primary, C secondary) -->
+                <g class="click" @click=${this.info("firebox_temperature")} opacity="${m.wood ? 1 : 0.5}">
+                    <text x="68" y="126" text-anchor="middle" fill="#8e9ea4" font-size="11">Foyer</text>
+                    <text x="68" y="152" text-anchor="middle" fill="#e7ecee" font-size="22" font-weight="600">${show(m.firebox, "°")}</text>
+                </g>
+                <g class="click" @click=${this.info("air_flow_engine_primary")} opacity="${m.wood ? 1 : 0.5}">
+                    <text x="36" y="316" fill="#8e9ea4" font-size="10">Primaire</text>
+                    <text x="100" y="333" text-anchor="end" fill="#e7ecee" font-size="15" font-weight="600">${show(m.airP, " %")}</text>
+                </g>
+                <g class="click" @click=${this.info("air_flow_engine_secondary")} opacity="${m.wood ? 1 : 0.5}">
+                    <text x="36" y="370" fill="#8e9ea4" font-size="10">Secondaire</text>
+                    <text x="100" y="388" text-anchor="end" fill="#e7ecee" font-size="15" font-weight="600">${show(m.airS, " %")}</text>
                 </g>
                 ${m.glow ? svg`<circle cx="68" cy="330" r="44" fill="url(#${id}_glow)" class="click" @click=${this.info("glow")}></circle>` : ""}
                 ${m.woodFlame > 0 ? svg`
@@ -457,7 +485,6 @@ export class BioTecPlusModern {
                 <div class="cap" style="color: ${m.wood ? "#ffc98f" : "#8a9aa0"};">Bois</div>
                 <div style="font-size: 22px; color: ${m.wood ? "#ffffff" : "#8d9ca2"};">${show(m.tw, "°")}</div>
             </div>
-            <div class="abs lbl click" style="left: 40px; top: 532px; width: 104px;" @click=${this.info("firebox_temperature")}>Foyer <b style="color: #ffd27a;">${show(m.firebox, " °C")}</b></div>
             ${m.tankLabel ? html`<div class="abs lbl click" style="left: 166px; top: 166px; width: 96px; color: ${m.tank == "Full" ? "#cfd8db" : (m.tank == "Reserve" ? "#ffd98a" : "#ffb3b6")};" @click=${this.info("tank_level")}>Granulés · ${m.tankLabel}</div>` : ""}
             <div class="abs lbl click" style="left: 152px; top: 532px; width: 124px;" @click=${this.info("boiler_temperature_pellet")}>Granulés <b style="color: ${m.wood ? "#a9b6bb" : "#ffffff"};">${show(m.tb, " °C")}</b></div>
             <div class="abs click" style="left: 282px; top: 152px; width: 100px;" @click=${this.info(m.wood ? "boiler_temperature_wood" : "boiler_temperature_pellet")}>
@@ -483,19 +510,11 @@ export class BioTecPlusModern {
             <!-- Right panel -->
             <div class="abs panel">
                 <div class="cap">Combustion</div>
-                <div class="row click" @click=${this.info("flue_gas")}><span>Fumées</span><span class="val">${show(m.flue, " °C")}</span></div>
-                <div class="row click" @click=${this.info("firebox_temperature")}><span>Foyer</span><span class="val">${show(m.firebox, " °C")}</span></div>
                 ${m.lambda !== null ? html`<div class="row click" @click=${this.info("lambda_sensor")}><span>Oxygène (λ)</span><span class="val">${m.lambda} %</span></div>` : ""}
                 <div class="row click" @click=${this.info("fire_sensor")}><span>Photocellule</span>
                     <span style="display: flex; align-items: center; gap: 8px;">${m.glow ? html`<span class="badge">Braise</span>` : ""}<span class="val">${m.fireText}</span></span></div>
                 <div class="sep"></div>
-                <div class="cap">Air &amp; alimentation</div>
-                <div class="row click" @click=${this.info("fan")}>
-                    <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${m.fan ? "#4aa3df" : "#56666c"}" stroke-width="2" stroke-linecap="round"><g class="${m.fan ? "spin" : ""}">${FAN_ICON}</g></svg>Ventilateur</span>
-                    <span class="val">${m.fanText}</span>
-                </div>
-                ${this.synopticGauge("Air primaire", m.airP, "air_flow_engine_primary")}
-                ${this.synopticGauge("Air secondaire", m.airS, "air_flow_engine_secondary")}
+                <div class="cap">Alimentation</div>
                 <div class="row click" @click=${this.info("pellet_dispenzer")}><span>Doseur granulés</span><span style="color: ${m.doser ? "#6fd08c" : "#a9b6bb"};">${m.doser ? "Actif" : "Arrêt"}</span></div>
                 <div class="sep"></div>
                 <div class="cap">Prise en charge</div>
