@@ -41,6 +41,7 @@ const FAN_ICON = svg`
 const FIRE_ICON = svg`<path d="M12 3c2 3.5 6 5.5 6 10a6 6 0 0 1-12 0c0-2.5 1.2-4 2.5-5 .3 2 1.3 3 2.5 3 0-3 0-5.5 1-8Z"></path>`
 const RADIATOR_ICON = svg`<rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M8 6v12M12 6v12M16 6v12"></path>`
 const HOUSE_ICON = svg`<path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path>`
+const DROP_ICON = svg`<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"></path>`
 const WIFI_OFF_ICON = svg`
     <path d="M2 8.8a15 15 0 0 1 20 0"></path><path d="M5.5 12.5a10 10 0 0 1 13 0"></path>
     <path d="M9 16a5 5 0 0 1 6 0"></path><path d="M12 20v.01"></path><path d="M3 3l18 18"></path>`
@@ -872,17 +873,44 @@ export class BioTecPlusModern {
                 ${this.powerButton(m)}
             </div>
             ${this.messages(m)}
+            <!-- Combustion: firebox, flue gas + O2, fan -->
+            <div class="stats">
+                <div class="click" @click=${this.info("firebox_temperature")}>
+                    <span>Foyer</span><b style="color: ${m.fireboxColor};">${show(m.firebox, "°")}</b>
+                </div>
+                <div class="click" @click=${this.info("flue_gas")}>
+                    <span>Fumées${m.lambda !== null ? " · O₂ " + m.lambda + " %" : ""}</span><b>${show(m.flue, "°")}</b>
+                </div>
+                <div class="click" @click=${this.info("fan")}>
+                    <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${m.fan ? "#4aa3df" : "currentColor"}" stroke-width="2.2" stroke-linecap="round"><g class="${m.fan ? "spin" : ""}">${FAN_ICON}</g></svg>Ventilateur</span>
+                    <b>${show(m.fanValue)} <span style="font-size: 11px; font-weight: 400;">${m.fanUnit}</span></b>
+                </div>
+            </div>
             ${m.hasBuffer ? html`
             <div class="click" style="display: flex; flex-direction: column; gap: 6px;" @click=${this.info("buffer_tank_temparature_up")}>
-                <div class="cap"><span>Tampon · bas ${show(m.bb, "°")}</span><span>haut ${show(m.bt, "°")}</span></div>
+                <div class="cap"><span>Tampon · bas ${show(m.bb, "°")}</span><span>${m.p1 ? "P1 en marche · " : ""}haut ${show(m.bt, "°")}</span></div>
                 <div class="gauge buf" style="background: linear-gradient(90deg, ${tempColor(m.bb)}, ${tempColor(m.bt)});"></div>
             </div>` : ""}
+            <!-- Radiators and room thermostat -->
+            ${m.hasFlow || m.hasRoom ? html`
             <div class="stats">
-                ${m.hasDhw ? html`<div class="click" @click=${this.info("domestic_hot_water")}><span>ECS</span><b>${show(m.dhw, "°")}</b></div>` : ""}
-                <div class="click" @click=${this.info("flue_gas")}><span>Fumées</span><b>${show(m.flue, "°")}</b></div>
-                ${m.lambda !== null ? html`<div class="click" @click=${this.info("lambda_sensor")}><span>O₂</span><b>${m.lambda} %</b></div>` :
-                    html`<div class="click" @click=${this.info("firebox_temperature")}><span>Foyer</span><b>${show(m.firebox, "°")}</b></div>`}
-            </div>
+                ${m.hasFlow ? html`
+                    <div class="click" @click=${this.info("circuit_1_flow_measured_temperature")}>
+                        <span>Radiateurs${m.hasP2 ? " · P2" : ""}</span>
+                        <b>${show(m.flow, "°")}${m.flowSet !== null ? html` <span style="font-size: 12px; font-weight: 400;">consigne ${m.flowSet}°</span>` : ""}</b>
+                    </div>` : ""}
+                ${m.hasRoom ? html`
+                    <div class="click" @click=${this.info("circuit_1_room_measured_temperature")}>
+                        <span>Maison</span>
+                        <b>${show(m.room, "°")}${m.roomSet !== null ? html` <span style="font-size: 12px; font-weight: 400;">consigne ${m.roomSet}°</span>` : ""}</b>
+                    </div>` : ""}
+            </div>` : ""}
+            ${m.hasDhw ? html`
+            <div class="click" style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: var(--cb-tile);" @click=${this.info("domestic_hot_water")}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="opacity: .7;">${DROP_ICON}</svg>
+                <span class="sub" style="flex-grow: 1;">Eau chaude sanitaire</span>
+                <b style="font-size: 18px;">${show(m.dhw, "°")}</b>
+            </div>` : ""}
         </div>`
     }
 
@@ -893,11 +921,11 @@ export class BioTecPlusModern {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round">${FIRE_ICON}</svg>
             </div>
             <div class="grow">
-                <b>Chaudière · ${show(m.active, " °C")}</b>
-                <span class="sub"><span class="dot" style="display: inline-block; margin-right: 6px; background: ${m.dot};"></span>${m.state}${m.unavailable ? "" : " · " + m.sourceLabel}</span>
+                <b>Chaudière ${m.sourceLabel} · ${show(m.active, " °C")}</b>
+                <span class="sub"><span class="dot" style="display: inline-block; margin-right: 6px; background: ${m.dot};"></span>${m.state}${m.unavailable ? "" : " · foyer " + show(m.firebox, "°")}</span>
             </div>
+            ${m.hasFlow ? html`<span class="chip">Rad. ${show(m.flow, "°")}</span>` : ""}
             ${m.hasDhw ? html`<span class="chip">ECS ${show(m.dhw, "°")}</span>` : ""}
-            ${m.hasBuffer ? html`<span class="chip">${show(m.bt, "°")}/${show(m.bb, "°")}</span>` : ""}
         </div>`
     }
 }
