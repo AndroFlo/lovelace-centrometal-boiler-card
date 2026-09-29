@@ -30,11 +30,13 @@ debug: true (optional)
 Only the BioTec Plus is supported. The entities are detected automatically; the former `device_type: biopl` option is still accepted, any other value shows an error.
 
 layout: (optional)
-- `synoptic` (default): modern schematic of the boiler — wood and pellet chambers, live flames, pumps and water flows, buffer and DHW tanks coloured by temperature, combustion / air panel. Scales with the card width, best in a full-width card.
+- `synoptic` (default): schematic of the whole installation — flue duct with the fan and the chimney, wood and pellet chambers with live flames, P1 to the buffer tank, P2 to the radiator, P3 to the DHW tank, tanks coloured by temperature. Scales with the card width, best in a full-width card.
 - `dashboard`: tiles following the Home Assistant theme (light or dark), for a half-width column.
 - `compact`: boiler temperature, state, buffer bar and key values.
 - `tile`: a single line for sections dashboards.
 - `classic`: the original Centrometal display.
+
+The radiator, the room thermostat and P3 are drawn only when the matching entities exist (heating circuit 1: `c1b_tpol1`, `c1b_tpol`, `c1b_tsob1`, `c1b_tsob`; third pump: `b_p3`, `b_zahp3`). Fan speed is shown as the percentage reported by `b_fan`, and there is no DHW setpoint entity, so none is displayed.
 
 Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled in wood mode and when access to the boiler is disabled.
 

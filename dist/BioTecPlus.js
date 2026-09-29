@@ -2,9 +2,9 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30-beta.2"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30-beta.2"
-import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.30-beta.2"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30-beta.3"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30-beta.3"
+import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.30-beta.3"
 
 export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
@@ -186,7 +186,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             ${this.conditional(this.values["boiler_state"] != "OFF",
                 this.createImage("biopl/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
                 this.createText("", 32,
-                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30-beta.2'); background-position: 0px 0px;",
+                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30-beta.3'); background-position: 0px 0px;",
                     945, 390, 36, 36, 4, null, "boiler_state"))}
 
             <!-- Buffers -->
