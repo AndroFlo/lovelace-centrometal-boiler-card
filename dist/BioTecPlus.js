@@ -45,6 +45,13 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             this.configureParameter("sensor.biotec", "second_pump|b_p2", "optional")
             this.configureParameter("sensor.biotec", "second_pump_demand|b_zahp2", "optional")
             this.configureParameter("sensor.biotec", "domestic_hot_water|b_tptv1", "optional")
+            this.configureParameter("sensor.biotec", "third_pump|b_p3", "optional")
+            this.configureParameter("sensor.biotec", "third_pump_demand|b_zahp3", "optional")
+            // Heating circuit 1: radiator flow and room thermostat
+            this.configureParameter("sensor.biotec", "circuit_1_flow_measured_temperature|c1b_tpol1", "optional")
+            this.configureParameter("sensor.biotec", "circuit_1_flow_target_temperature|c1b_tpol", "optional")
+            this.configureParameter("sensor.biotec", "circuit_1_room_measured_temperature|c1b_tsob1", "optional")
+            this.configureParameter("sensor.biotec", "circuit_1_room_target_temperature|c1b_tsob", "optional")
 
             // Service
             this.configureParameter("switch.biotec", "boiler_switch")

@@ -10,6 +10,13 @@ const COLD = [47, 120, 184]
 const HOT = [233, 128, 58]
 const GREY = "#3a474d"
 
+// Thresholds from the design kit (data/tokens.json)
+const FLAME_MAX_TEMP = 400      // firebox temperature giving a full-size flame
+const FLAME_MIN_SCALE = 0.22
+const FIREBOX_HOT = 300         // above: yellow, below: orange
+const SMOKE_VISIBLE = 80        // flue temperature showing smoke puffs
+const CHIMNEY_HOT = 100         // flue temperature turning the chimney orange
+
 // Blue (25 °C) -> orange (70 °C)
 function tempColor(t) {
     if (t === null) {
@@ -33,6 +40,10 @@ const FAN_ICON = svg`
     <path d="M12 12c0 4-1 8-4 8-2 0-3-2-1-4l5-4Z"></path><path d="M12 12c-4 0-8-1-8-4 0-2 2-3 4-1l4 5Z"></path>`
 const FIRE_ICON = svg`<path d="M12 3c2 3.5 6 5.5 6 10a6 6 0 0 1-12 0c0-2.5 1.2-4 2.5-5 .3 2 1.3 3 2.5 3 0-3 0-5.5 1-8Z"></path>`
 const RADIATOR_ICON = svg`<rect x="3" y="6" width="18" height="12" rx="2"></rect><path d="M8 6v12M12 6v12M16 6v12"></path>`
+const HOUSE_ICON = svg`<path d="M3 11l9-7 9 7"></path><path d="M5 10v10h14V10"></path>`
+const WIFI_OFF_ICON = svg`
+    <path d="M2 8.8a15 15 0 0 1 20 0"></path><path d="M5.5 12.5a10 10 0 0 1 13 0"></path>
+    <path d="M9 16a5 5 0 0 1 6 0"></path><path d="M12 20v.01"></path><path d="M3 3l18 18"></path>`
 const TAP_ICON = svg`<path d="M4 8h10a4 4 0 0 1 4 4v1"></path><path d="M8 5v3"></path><path d="M18 17v.01M16 20v.01M20 20v.01"></path>`
 const ALERT_ICON = svg`<circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16v.01"></path>`
 
@@ -70,7 +81,7 @@ const STYLE = html`<style>
     .syn .lbl { font-size: 11px; color: #a9b6bb; text-align: center; }
     .syn .big { font-size: 28px; font-weight: 600; line-height: 1; }
     .syn .ts { text-shadow: 0 1px 6px rgba(0, 0, 0, .4); }
-    .syn .panel { left: 664px; top: 118px; width: 272px; height: 436px; box-sizing: border-box; padding: 18px; border-radius: 16px; background: #141d21; border: 1px solid #223035; display: flex; flex-direction: column; gap: 10px; }
+    .syn .panel { left: 664px; top: 118px; width: 272px; box-sizing: border-box; padding: 18px; border-radius: 16px; background: #141d21; border: 1px solid #223035; display: flex; flex-direction: column; gap: 10px; }
     .syn .row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
     .syn .row > span:first-child { color: #a9b6bb; display: flex; align-items: center; gap: 8px; }
     .syn .val { font-size: 15px; font-weight: 500; }
@@ -84,7 +95,30 @@ const STYLE = html`<style>
     .syn .badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #3a2616; color: #ffc98f; }
     .syn .strip { left: 24px; top: 564px; width: 912px; height: 26px; display: flex; align-items: center; gap: 20px; font-size: 12px; color: #a9b6bb; }
     .syn .strip b { color: #e7ecee; font-weight: 500; }
-    .syn .veil { left: 0; top: 70px; width: 960px; height: 530px; background: rgba(14, 20, 23, .78); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    .syn .veil { left: 0; top: 70px; width: 960px; height: 530px; background: rgba(14, 20, 23, .72); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    /* Numbers use the display face of the design kit, with a system fallback */
+    .syn .num { font-family: 'Space Grotesk', var(--ha-font-family-body, system-ui), sans-serif; font-weight: 600; }
+    .syn .puff { transform-box: fill-box; transform-origin: center; animation: cb-puff 2.4s linear infinite; }
+    .syn .puff:nth-of-type(2) { animation-delay: .8s; }
+    .syn .puff:nth-of-type(3) { animation-delay: 1.6s; }
+    @keyframes cb-puff { from { transform: translateY(0) scale(1); opacity: .55; } to { transform: translateY(-18px) scale(2.5); opacity: 0; } }
+    /* Phase strip */
+    .syn .steps { left: 24px; top: 562px; width: 912px; height: 26px; display: flex; align-items: center; gap: 10px; font-size: 12px; }
+    .syn .steps .link { flex-grow: 1; height: 1px; background: #2a383e; }
+    .syn .steps .st { display: flex; align-items: center; gap: 6px; }
+    .syn .steps .st > span { width: 8px; height: 8px; border-radius: 50%; box-sizing: border-box; flex-shrink: 0; }
+    .syn .steps .done { color: #a9b6bb; }
+    .syn .steps .done > span { background: #56666c; }
+    .syn .steps .todo { color: #6d7d83; }
+    .syn .steps .todo > span { border: 1.5px solid #3a484e; }
+    .syn .steps .cur { padding: 3px 10px; border-radius: 999px; background: #2a1d12; color: #ffc98f; font-weight: 600; }
+    .syn .steps .cur > span { background: #f08a3c; }
+    /* Wood air bars */
+    .syn .air { display: flex; flex-direction: column; gap: 3px; }
+    .syn .air .top { display: flex; justify-content: space-between; font-size: 11px; }
+    .syn .air .top > span:first-child { color: #a9b6bb; }
+    .syn .air .rail { height: 5px; border-radius: 3px; background: #223035; }
+    .syn .air .rail > div { height: 5px; border-radius: 3px; background: #4aa3df; }
 
     /* Dashboard / compact / tile: fluid, follow the HA theme */
     .db, .cp, .tl { --cb-bg: var(--ha-card-background, var(--card-background-color, #fff)); --cb-tile: var(--secondary-background-color, #f3f0ea);
@@ -188,11 +222,19 @@ export class BioTecPlusModern {
 
         // Photocell of the pellet burner: < 1000 kOhm = flame seen, lower = brighter
         const fire = num("fire_sensor")
-        const pelletFlame = (fire === null || fire >= 1000) ? 0 : (fire < 100 ? 1 : (fire < 400 ? 0.75 : 0.5))
-        // Wood fire intensity from the firebox temperature (wood mode only)
+        const pelletLit = fire !== null && fire < 1000
+        // Firebox temperature drives both flames (design kit: 400 °C = full size)
         const firebox = temp("firebox_temperature", 1000)
-        const woodFlame = (!wood || firebox === null) ? 0 : (firebox > 300 ? 1 : (firebox > 150 ? 0.7 : (firebox > 80 ? 0.45 : 0)))
+        const flameScale = (lit) => {
+            if (!lit || firebox === null) {
+                return 0
+            }
+            return Math.max(FLAME_MIN_SCALE, Math.min(1, firebox / FLAME_MAX_TEMP))
+        }
+        const pelletFlame = flameScale(!wood && pelletLit)
+        const woodFlame = flameScale(wood && !off)
 
+        const flue = temp("flue_gas", 1000)
         const lambda = num("lambda_sensor")
         const fan = has("fan") && v["fan"] != 0
         const fanValue = num("fan")
@@ -223,7 +265,11 @@ export class BioTecPlusModern {
             tb: tb,
             active: wood ? tw : tb,
             firebox: firebox,
-            flue: temp("flue_gas", 1000),
+            fireboxColor: (pelletFlame == 0 && woodFlame == 0) ? "#8a9aa0"
+                : (firebox !== null && firebox >= FIREBOX_HOT ? "#ffd27a" : "#f5a261"),
+            flue: flue,
+            smoke: flue !== null && flue > SMOKE_VISIBLE,
+            chimneyHot: flue !== null && flue > CHIMNEY_HOT,
             outdoor: temp("outdoor_temperature"),
             bt: temp("buffer_tank_temparature_up"),
             bb: temp("buffer_tank_temparature_down"),
@@ -239,6 +285,9 @@ export class BioTecPlusModern {
             lambda: (lambda !== null && lambda > 0.1) ? (lambda < 25.4 ? lambda : "-.-") : null,
             fan: fan,
             fanText: !has("fan") ? "--" : (fan ? (fanValue !== null && fanValue > 1 ? fanValue + this.unit("fan") : "En marche") : "Arrêt"),
+            // b_fan is a percentage, not the rpm the design kit assumes
+            fanValue: fanValue,
+            fanUnit: (this.unit("fan") || " %").trim(),
             airP: num("air_flow_engine_primary"),
             airS: num("air_flow_engine_secondary"),
             doser: has("pellet_dispenzer") && v["pellet_dispenzer"] != 0,
@@ -247,6 +296,16 @@ export class BioTecPlusModern {
             hasP2: "second_pump" in v,
             p2: v["second_pump"] == 1,
             p2d: v["second_pump_demand"] == 1,
+            hasP3: "third_pump" in v,
+            p3: v["third_pump"] == 1,
+            p3d: v["third_pump_demand"] == 1,
+            // Heating circuit 1 (optional): radiator flow and room thermostat
+            flow: temp("circuit_1_flow_measured_temperature"),
+            flowSet: temp("circuit_1_flow_target_temperature"),
+            room: temp("circuit_1_room_measured_temperature", 60),
+            roomSet: temp("circuit_1_room_target_temperature", 60),
+            hasFlow: "circuit_1_flow_measured_temperature" in v,
+            hasRoom: "circuit_1_room_measured_temperature" in v,
             tank: tank,
             tankLabel: { "Full": "plein", "Reserve": "réserve", "Empty": "vide" }[tank] || null,
             mode: opMode === null ? null : (opMode == 1 ? "Eau chaude" : "Chauffage"),
@@ -320,25 +379,34 @@ export class BioTecPlusModern {
 
     // A · Synoptic ------------------------------------------------------
 
+    // A · Synoptic (geometry from the design kit: 960x600 canvas, 616x436 schematic at 24,118)
     synoptic(m) {
         const width = this.d.card.width || this.d.card.offsetWidth || 960
         const scale = width / 960
         const id = this.d.card_id
-        const hot = m.p1 ? "#f08a3c" : GREY
-        const cold = m.p1 ? "#4aa3df" : GREY
-        const dhwHot = m.p2 ? "#f08a3c" : GREY
-        const dhwCold = m.p2 ? "#4aa3df" : GREY
-        const tankFill = { "Full": [84, 44], "Reserve": [112, 16], "Empty": [128, 0] }[m.tank] || [84, 44]
+        const grey = GREY
+        const hot = m.p1 ? "#f08a3c" : grey
+        const cold = m.p1 ? "#4aa3df" : grey
+        const radHot = m.p2 ? "#f08a3c" : grey
+        const radCold = m.p2 ? "#4aa3df" : grey
+        const ecsHot = m.p3 ? "#f08a3c" : grey
+        const ecsCold = m.p3 ? "#4aa3df" : grey
+        const tank = { "Full": [124, 40], "Reserve": [150, 14], "Empty": [164, 0] }[m.tank] || [124, 40]
         const tankStroke = m.tank == "Reserve" ? "#b8892f" : (m.tank == "Empty" ? "#c2474d" : "#2c3a40")
         const takeLabels = ["Inactive", "Granulés ON", "Granulés OFF"]
+        const woodLit = m.woodFlame > 0
+        const pelletLit = m.pelletFlame > 0
+        // Air bars only mean something while the wood fire is burning
+        const airP = woodLit && m.airP !== null ? m.airP : 0
+        const airS = woodLit && m.airS !== null ? m.airS : 0
 
         return html`
         <div class="cb cb-wrap" style="height: ${600 * scale}px;">
         <div class="syn" style="transform: scale(${scale});">
 
             <!-- Top bar -->
-            <div class="abs" style="left: 24px; right: 24px; top: 18px; height: 48px; display: flex; align-items: center; gap: 16px;">
-                <div style="font-size: 20px; font-weight: 600;">BioTec Plus</div>
+            <div class="abs" style="left: 24px; top: 18px; width: 912px; height: 48px; display: flex; align-items: center; gap: 16px;">
+                <div class="num" style="font-size: 20px; letter-spacing: -.01em;">BioTec Plus</div>
                 <div class="chip click" @click=${this.info("boiler_state")}>
                     <span class="dot" style="background: ${m.dot};"></span>
                     <span>${m.state}${m.unavailable || m.off ? "" : " · " + m.sourceLabel}</span>
@@ -348,7 +416,7 @@ export class BioTecPlusModern {
                     <div class="click" style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #a9b6bb;" @click=${this.info("outdoor_temperature")}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a9b6bb" stroke-width="1.8" stroke-linecap="round"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4 4 0 1 0 4 0Z"></path></svg>
                         <span>Extérieur</span>
-                        <span style="font-size: 16px; color: #e7ecee;">${show(m.outdoor, " °C")}</span>
+                        <span class="num" style="font-size: 16px; color: #e7ecee;">${show(m.outdoor, " °C")}</span>
                     </div>` : ""}
                 ${m.mode ? html`
                     <div class="pill click" @click=${this.info("operation_mode")}>
@@ -370,20 +438,6 @@ export class BioTecPlusModern {
                     <span>${m.banner.text}</span>
                 </div>` : "")}
 
-            <!-- Flue gas and fan, above the boiler on the left -->
-            ${this.confirm || m.banner ? "" : html`
-                <div class="abs" style="left: 24px; top: 76px; height: 34px; display: flex; align-items: center; gap: 22px;">
-                    <div class="click" style="display: flex; align-items: baseline; gap: 7px;" @click=${this.info("flue_gas")}>
-                        <span style="font-size: 12px; color: #8e9ea4;">Fumées</span>
-                        <span style="font-size: 19px; font-weight: 600;">${show(m.flue, " °C")}</span>
-                    </div>
-                    <div class="click" style="display: flex; align-items: center; gap: 7px;" @click=${this.info("fan")}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${m.fan ? "#4aa3df" : "#56666c"}" stroke-width="2" stroke-linecap="round"><g class="${m.fan ? "spin" : ""}">${FAN_ICON}</g></svg>
-                        <span style="font-size: 12px; color: #8e9ea4;">Ventilateur</span>
-                        <span style="font-size: 19px; font-weight: 600;">${m.fanText}</span>
-                    </div>
-                </div>`}
-
             <!-- Schematic -->
             <svg class="abs" width="616" height="436" viewBox="0 0 616 436" style="left: 24px; top: 118px;">
                 <defs>
@@ -402,44 +456,56 @@ export class BioTecPlusModern {
                     </radialGradient>
                 </defs>
 
-                <!-- Wood chamber -->
-                <g opacity="${m.wood ? 1 : 0.5}" class="click" @click=${this.info("boiler_temperature_wood")}>
-                    <rect x="16" y="60" width="104" height="350" rx="14" fill="#151e22" stroke="${m.wood ? "#f08a3c" : "#26343a"}" stroke-width="1.5"></rect>
-                    <rect x="30" y="80" width="76" height="110" rx="8" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
-                    <rect x="30" y="300" width="76" height="40" rx="6" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
-                    <rect x="30" y="352" width="76" height="44" rx="6" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
+                <!-- Flue duct and chimney -->
+                <rect x="16" y="70" width="230" height="18" rx="9" fill="#151e22" stroke="#2c3a40" stroke-width="1.5"></rect>
+                <rect x="68" y="86" width="14" height="12" fill="#151e22"></rect>
+                <rect x="178" y="86" width="14" height="12" fill="#151e22"></rect>
+                <g class="click" @click=${this.info("flue_gas")}>
+                    <rect x="228" y="16" width="18" height="66" rx="3" fill="#1c272c" stroke="${m.chimneyHot ? "#f08a3c" : "#2c3a40"}" stroke-width="1.5"></rect>
+                    <rect x="224" y="12" width="26" height="6" rx="2" fill="#1c272c" stroke="${m.chimneyHot ? "#f08a3c" : "#2c3a40"}" stroke-width="1.5"></rect>
+                </g>
+                ${m.smoke ? svg`
+                    <g>
+                        <circle class="puff" cx="237" cy="10" r="4" fill="#8a9aa0" opacity="0"></circle>
+                        <circle class="puff" cx="240" cy="10" r="4" fill="#8a9aa0" opacity="0"></circle>
+                        <circle class="puff" cx="234" cy="10" r="4" fill="#8a9aa0" opacity="0"></circle>
+                    </g>` : ""}
+
+                <!-- Single fan on the duct -->
+                <g class="click" @click=${this.info("fan")}>
+                    <circle cx="124" cy="79" r="13" fill="#0e1417" stroke="${m.fan ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
+                    <g transform="translate(115 70) scale(0.75)" fill="none" stroke-width="2" stroke-linecap="round">
+                        ${m.fan
+                            ? svg`<g class="spin" stroke="#4aa3df">${FAN_ICON}</g>`
+                            : svg`<g stroke="#56666c">${FAN_ICON}</g>`}
+                    </g>
                 </g>
 
-                <!-- Firebox temperature (A) and wood air flaps (B primary, C secondary) -->
-                <g class="click" @click=${this.info("firebox_temperature")} opacity="${m.wood ? 1 : 0.5}">
-                    <text x="68" y="126" text-anchor="middle" fill="#8e9ea4" font-size="11">Foyer</text>
-                    <text x="68" y="152" text-anchor="middle" fill="#e7ecee" font-size="22" font-weight="600">${show(m.firebox, "°")}</text>
+                <!-- Wood chamber -->
+                <g opacity="${m.wood ? 1 : 0.5}" class="click" @click=${this.info("boiler_temperature_wood")}>
+                    <rect x="16" y="96" width="104" height="314" rx="14" fill="#151e22" stroke="${m.wood ? "#f08a3c" : "#26343a"}" stroke-width="1.5"></rect>
+                    <rect x="30" y="110" width="76" height="80" rx="8" fill="none" stroke="#2c3a40" stroke-width="1.5"></rect>
                 </g>
-                <g class="click" @click=${this.info("air_flow_engine_primary")} opacity="${m.wood ? 1 : 0.5}">
-                    <text x="36" y="316" fill="#8e9ea4" font-size="10">Primaire</text>
-                    <text x="100" y="333" text-anchor="end" fill="#e7ecee" font-size="15" font-weight="600">${show(m.airP, " %")}</text>
-                </g>
-                <g class="click" @click=${this.info("air_flow_engine_secondary")} opacity="${m.wood ? 1 : 0.5}">
-                    <text x="36" y="370" fill="#8e9ea4" font-size="10">Secondaire</text>
-                    <text x="100" y="388" text-anchor="end" fill="#e7ecee" font-size="15" font-weight="600">${show(m.airS, " %")}</text>
-                </g>
-                ${m.glow ? svg`<circle cx="68" cy="330" r="44" fill="url(#${id}_glow)" class="click" @click=${this.info("glow")}></circle>` : ""}
-                ${m.woodFlame > 0 ? svg`
-                    <circle cx="68" cy="270" r="${24 + 30 * m.woodFlame}" fill="url(#${id}_glow)"></circle>
-                    <g transform="translate(68 300) scale(${0.8 * m.woodFlame})"><g class="flicker">${FLAME}</g></g>` : ""}
+                ${woodLit ? svg`
+                    <g class="click" @click=${this.info("firebox_temperature")}>
+                        <circle cx="68" cy="270" r="50" fill="url(#${id}_glow)"></circle>
+                        <g transform="translate(68 300) scale(${m.woodFlame})"><g class="flicker">${FLAME}</g></g>
+                    </g>` : ""}
 
                 <!-- Pellet chamber -->
                 <g opacity="${m.wood ? 0.5 : 1}">
-                    <rect x="128" y="24" width="124" height="386" rx="14" fill="#18242a" stroke="${!m.wood && !m.off ? "#f08a3c" : "#2c3a40"}" stroke-width="1.5"></rect>
-                    <rect x="142" y="40" width="96" height="92" rx="10" fill="#10181b" stroke="${tankStroke}" stroke-width="1.5" class="click" @click=${this.info("tank_level")}></rect>
-                    ${m.tank !== null ? svg`<rect x="146" y="${tankFill[0]}" width="88" height="${tankFill[1]}" rx="6" fill="#b98a55" opacity="0.85"></rect>` : ""}
-                    <rect x="184" y="140" width="12" height="76" rx="6" fill="${m.doser ? "#4aa3df" : "#2c3a40"}" class="click" @click=${this.info("pellet_dispenzer")}></rect>
+                    <rect x="128" y="96" width="124" height="314" rx="14" fill="#18242a" stroke="${pelletLit ? "#f08a3c" : "#2c3a40"}" stroke-width="1.5"></rect>
+                    <rect x="142" y="104" width="96" height="64" rx="10" fill="#10181b" stroke="${tankStroke}" stroke-width="1.5" class="click" @click=${this.info("tank_level")}></rect>
+                    ${m.tank !== null ? svg`<rect x="146" y="${tank[0]}" width="88" height="${tank[1]}" rx="6" fill="#b98a55" opacity="0.85"></rect>` : ""}
+                    <rect x="184" y="174" width="12" height="48" rx="6" fill="${m.doser ? "#4aa3df" : "#2c3a40"}" class="click" @click=${this.info("pellet_dispenzer")}></rect>
                     <rect x="150" y="226" width="80" height="154" rx="12" fill="#0f1719" stroke="#2c3a40" stroke-width="1.5" class="click" @click=${this.info("fire_sensor")}></rect>
                     <path d="M162 368 H218" stroke="#5b6b72" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"></path>
                 </g>
-                ${m.pelletFlame > 0 ? svg`
-                    <circle cx="190" cy="326" r="${30 + 34 * m.pelletFlame}" fill="url(#${id}_glow)"></circle>
-                    <g transform="translate(190 360) scale(${m.pelletFlame})"><g class="flicker">${FLAME}</g></g>` : ""}
+                ${pelletLit ? svg`
+                    <g class="click" @click=${this.info("firebox_temperature")}>
+                        <circle cx="190" cy="326" r="${30 + 34 * m.pelletFlame}" fill="url(#${id}_glow)"></circle>
+                        <g transform="translate(190 360) scale(${m.pelletFlame})"><g class="flicker">${FLAME}</g></g>
+                    </g>` : ""}
 
                 <!-- Boiler <-> buffer, pump P1 -->
                 <path d="M252 96 H360" fill="none" stroke="${hot}" opacity="0.35" stroke-width="5"></path>
@@ -448,9 +514,11 @@ export class BioTecPlusModern {
                     <path d="M252 96 H360" fill="none" class="flow" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"></path>
                     <path d="M360 360 H252" fill="none" class="flow" stroke="#4aa3df" stroke-width="4" stroke-linecap="round"></path>` : ""}
                 <g class="click" @click=${this.info("boiler_pump")}>
-                    <circle cx="306" cy="360" r="17" fill="#0e1417" stroke="${m.p1 ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
-                    <path class="${m.p1 ? "spin" : ""}" d="M300 351 L315 360 L300 369 Z" fill="${m.p1 ? "#4aa3df" : "#4d5c62"}"></path>
-                    ${m.p1d ? svg`<circle cx="321" cy="344" r="4" fill="#6fd08c"></circle>` : ""}
+                    <circle cx="306" cy="96" r="17" fill="#0e1417" stroke="${m.p1 ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
+                    ${m.p1
+                        ? svg`<path class="spin" d="M300 87 L315 96 L300 105 Z" fill="#4aa3df"></path>`
+                        : svg`<path d="M300 87 L315 96 L300 105 Z" fill="#4d5c62"></path>`}
+                    ${m.p1d ? svg`<circle cx="321" cy="80" r="4" fill="#6fd08c"></circle>` : ""}
                 </g>
 
                 <!-- Buffer tank -->
@@ -458,84 +526,152 @@ export class BioTecPlusModern {
                     <g class="click" @click=${this.info("buffer_tank_temparature_up")}>
                         <rect x="360" y="30" width="110" height="370" rx="55" fill="url(#${id}_buf)"></rect>
                         <rect x="360" y="30" width="110" height="370" rx="55" fill="none" stroke="#ffffff" opacity="0.16" stroke-width="1.5"></rect>
-                    </g>` : svg`
-                    <path d="M360 96 V360" fill="none" stroke="${GREY}" opacity="0.35" stroke-width="5" stroke-dasharray="2 8"></path>`}
+                    </g>` : ""}
 
-                <!-- DHW tank, pump P2 -->
-                ${m.hasDhw ? svg`
-                    <path d="M470 90 H560 V130" fill="none" stroke="${dhwHot}" opacity="0.35" stroke-width="5"></path>
-                    <path d="M560 340 V380 H470" fill="none" stroke="${dhwCold}" opacity="0.35" stroke-width="5"></path>
+                <!-- Buffer -> radiators, pump P2 -->
+                ${m.hasP2 ? svg`
+                    <path d="M470 90 H590 V124" fill="none" stroke="${radHot}" opacity="0.35" stroke-width="5"></path>
+                    <path d="M540 226 V250 H470" fill="none" stroke="${radCold}" opacity="0.35" stroke-width="5"></path>
                     ${m.p2 ? svg`
-                        <path d="M470 90 H560 V130" fill="none" class="flow" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"></path>
-                        <path d="M560 340 V380 H470" fill="none" class="flow" stroke="#4aa3df" stroke-width="4" stroke-linecap="round"></path>` : ""}
-                    ${m.hasP2 ? svg`
-                        <g class="click" @click=${this.info("second_pump")}>
-                            <circle cx="515" cy="380" r="15" fill="#0e1417" stroke="${m.p2 ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
-                            <path class="${m.p2 ? "spin" : ""}" d="M510 372 L523 380 L510 388 Z" fill="${m.p2 ? "#4aa3df" : "#4d5c62"}"></path>
-                            ${m.p2d ? svg`<circle cx="529" cy="365" r="4" fill="#6fd08c"></circle>` : ""}
+                        <path d="M470 90 H590 V124" fill="none" class="flow" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"></path>
+                        <path d="M540 226 V250 H470" fill="none" class="flow" stroke="#4aa3df" stroke-width="4" stroke-linecap="round"></path>` : ""}
+                    <g class="click" @click=${this.info("second_pump")}>
+                        <circle cx="515" cy="90" r="15" fill="#0e1417" stroke="${m.p2 ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
+                        ${m.p2
+                            ? svg`<path class="spin" d="M510 82 L523 90 L510 98 Z" fill="#4aa3df"></path>`
+                            : svg`<path d="M510 82 L523 90 L510 98 Z" fill="#4d5c62"></path>`}
+                        ${m.p2d ? svg`<circle cx="529" cy="75" r="4" fill="#6fd08c"></circle>` : ""}
+                    </g>
+                    <g class="click" @click=${this.info("circuit_1_flow_measured_temperature")}>
+                        <rect x="526" y="124" width="78" height="102" rx="6" fill="${tempColor(m.flow)}"></rect>
+                        <path d="M540 132 V218" stroke="#0e1417" opacity="0.35" stroke-width="3" stroke-linecap="round"></path>
+                        <path d="M553 132 V218" stroke="#0e1417" opacity="0.35" stroke-width="3" stroke-linecap="round"></path>
+                        <path d="M566 132 V218" stroke="#0e1417" opacity="0.35" stroke-width="3" stroke-linecap="round"></path>
+                        <path d="M579 132 V218" stroke="#0e1417" opacity="0.35" stroke-width="3" stroke-linecap="round"></path>
+                        <path d="M592 132 V218" stroke="#0e1417" opacity="0.35" stroke-width="3" stroke-linecap="round"></path>
+                        <rect x="526" y="124" width="78" height="102" rx="6" fill="none" stroke="#ffffff" opacity="0.16" stroke-width="1.5"></rect>
+                    </g>` : ""}
+
+                <!-- Buffer -> DHW tank, pump P3 -->
+                ${m.hasDhw ? svg`
+                    <path d="M470 280 H530" fill="none" stroke="${ecsHot}" opacity="0.35" stroke-width="5"></path>
+                    <path d="M530 336 H470" fill="none" stroke="${ecsCold}" opacity="0.35" stroke-width="5"></path>
+                    ${m.p3 ? svg`
+                        <path d="M470 280 H530" fill="none" class="flow" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"></path>
+                        <path d="M530 336 H470" fill="none" class="flow" stroke="#4aa3df" stroke-width="4" stroke-linecap="round"></path>` : ""}
+                    ${m.hasP3 ? svg`
+                        <g class="click" @click=${this.info("third_pump")}>
+                            <circle cx="500" cy="280" r="13" fill="#0e1417" stroke="${m.p3 ? "#4aa3df" : "#4d5c62"}" stroke-width="2"></circle>
+                            ${m.p3
+                                ? svg`<path class="spin" d="M495 273 L507 280 L495 287 Z" fill="#4aa3df"></path>`
+                                : svg`<path d="M495 273 L507 280 L495 287 Z" fill="#4d5c62"></path>`}
                         </g>` : ""}
                     <g class="click" @click=${this.info("domestic_hot_water")}>
-                        <rect x="520" y="130" width="80" height="210" rx="40" fill="url(#${id}_dhw)"></rect>
-                        <rect x="520" y="130" width="80" height="210" rx="40" fill="none" stroke="#ffffff" opacity="0.16" stroke-width="1.5"></rect>
+                        <rect x="530" y="262" width="70" height="150" rx="35" fill="url(#${id}_dhw)"></rect>
+                        <rect x="530" y="262" width="70" height="150" rx="35" fill="none" stroke="#ffffff" opacity="0.16" stroke-width="1.5"></rect>
                     </g>` : ""}
             </svg>
 
-            <!-- Schematic labels -->
-            <div class="abs click" style="left: 40px; top: 186px; width: 104px; text-align: center;" @click=${this.info("boiler_temperature_wood")}>
-                <div class="cap" style="color: ${m.wood ? "#ffc98f" : "#8a9aa0"};">Bois</div>
-                <div style="font-size: 22px; color: ${m.wood ? "#ffffff" : "#8d9ca2"};">${show(m.tw, "°")}</div>
+            <!-- Schematic labels (canvas coordinates: 24 + x_svg, 118 + y_svg) -->
+            <div class="abs click" style="left: 100px; top: 132px; width: 96px; text-align: center; line-height: 1.15;" @click=${this.info("fan")}>
+                <div style="font-size: 11px; color: #8a9aa0;">Ventilateur</div>
+                <div><span class="num" style="font-size: 16px; color: ${m.fan ? "#e7ecee" : "#8a9aa0"};">${show(m.fanValue)}</span>
+                    <span style="font-size: 11px; color: #8a9aa0;">${m.fanUnit}</span></div>
             </div>
-            ${m.tankLabel ? html`<div class="abs lbl click" style="left: 166px; top: 166px; width: 96px; color: ${m.tank == "Full" ? "#cfd8db" : (m.tank == "Reserve" ? "#ffd98a" : "#ffb3b6")};" @click=${this.info("tank_level")}>Granulés · ${m.tankLabel}</div>` : ""}
-            <div class="abs lbl click" style="left: 152px; top: 532px; width: 124px;" @click=${this.info("boiler_temperature_pellet")}>Granulés <b style="color: ${m.wood ? "#a9b6bb" : "#ffffff"};">${show(m.tb, " °C")}</b></div>
-            <div class="abs click" style="left: 282px; top: 152px; width: 100px;" @click=${this.info(m.wood ? "boiler_temperature_wood" : "boiler_temperature_pellet")}>
-                <div style="font-size: 30px; font-weight: 600; line-height: 1;">${show(m.active, "°")}</div>
-                <div class="lbl" style="text-align: left; margin-top: 4px;">Chaudière ${m.sourceLabel}</div>
+            <div class="abs click" style="left: 280px; top: 126px; width: 90px; line-height: 1.15;" @click=${this.info("flue_gas")}>
+                <div style="font-size: 11px; color: #8a9aa0;">Fumées</div>
+                <div class="num" style="font-size: 18px;">${show(m.flue, " °C")}</div>
+                ${m.lambda !== null ? html`
+                    <div style="font-size: 12px; color: #a9b6bb; margin-top: 3px;">O₂
+                        <span class="num" style="font-size: 14px; color: #e7ecee;">${m.lambda} %</span></div>` : ""}
             </div>
-            <div class="abs lbl" style="left: 290px; top: 502px; width: 80px;">P1 · ${m.p1 ? "marche" : (m.p1d ? "demande" : "arrêt")}</div>
-            ${m.hasDhw && m.hasP2 ? html`<div class="abs lbl" style="left: 479px; top: 520px; width: 72px;">P2 · ${m.p2 ? "marche" : (m.p2d ? "demande" : "arrêt")}</div>` : ""}
+            <div class="abs click" style="left: 40px; top: 244px; width: 104px; text-align: center;" @click=${this.info("boiler_temperature_wood")}>
+                <div style="font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: ${m.wood ? "#ffc98f" : "#8a9aa0"};">Bois</div>
+                <div class="num" style="font-size: 22px; font-weight: 400; color: ${m.wood ? "#ffffff" : "#8d9ca2"};">${show(m.tw, "°")}</div>
+            </div>
+            <!-- Single firebox sensor: the label sits under the chamber in use -->
+            <div class="abs click" style="left: ${m.wood ? 36 : 152}px; top: ${m.wood ? 424 : 502}px; width: ${m.wood ? 112 : 124}px; text-align: center; font-size: 12px; color: #a9b6bb;" @click=${this.info("firebox_temperature")}>
+                Foyer <span style="color: ${m.fireboxColor}; font-weight: 600;">${show(m.firebox, " °C")}</span>
+            </div>
+            ${m.wood ? "" : html`
+                <div class="abs click" style="left: 282px; top: 262px; width: 100px;" @click=${this.info("boiler_temperature_pellet")}>
+                    <div class="num" style="font-size: 30px; line-height: 1; color: #ffffff;">${show(m.tb, "°")}</div>
+                    <div style="font-size: 11px; color: #a9b6bb; margin-top: 4px;">Chaudière granulés</div>
+                </div>`}
+            <div class="abs lbl" style="left: 294px; top: 236px; width: 72px;">P1</div>
+
+            <!-- Wood air bars -->
+            <div class="abs" style="left: 48px; top: 450px; width: 88px; display: flex; flex-direction: column; gap: 8px;">
+                <div class="air click" @click=${this.info("air_flow_engine_primary")}>
+                    <div class="top"><span>Air prim.</span><span>${airP} %</span></div>
+                    <div class="rail"><div style="width: ${airP}%;"></div></div>
+                </div>
+                <div class="air click" @click=${this.info("air_flow_engine_secondary")}>
+                    <div class="top"><span>Air sec.</span><span>${airS} %</span></div>
+                    <div class="rail"><div style="width: ${airS}%;"></div></div>
+                </div>
+            </div>
+
+            <!-- Buffer labels -->
             ${m.hasBuffer ? html`
                 <div class="abs ts click" style="left: 384px; top: 182px; width: 110px; text-align: center;" @click=${this.info("buffer_tank_temparature_up")}>
-                    <div class="big">${show(m.bt, "°")}</div><div style="font-size: 11px; margin-top: 2px;">haut</div>
+                    <div class="num" style="font-size: 28px; line-height: 1;">${show(m.bt, "°")}</div>
+                    <div style="font-size: 11px; margin-top: 2px;">haut</div>
                 </div>
-                <div class="abs ts cap" style="left: 384px; top: 324px; width: 110px; text-align: center; color: #e7ecee;">Tampon</div>
+                <div class="abs ts" style="left: 384px; top: 324px; width: 110px; text-align: center; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;">Tampon</div>
                 <div class="abs ts click" style="left: 384px; top: 444px; width: 110px; text-align: center;" @click=${this.info("buffer_tank_temparature_down")}>
-                    <div class="big">${show(m.bb, "°")}</div><div style="font-size: 11px; margin-top: 2px;">bas</div>
-                </div>` : html`
-                <div class="abs lbl" style="left: 300px; top: 330px; width: 120px;">Vers l'installation</div>`}
+                    <div class="num" style="font-size: 28px; line-height: 1;">${show(m.bb, "°")}</div>
+                    <div style="font-size: 11px; margin-top: 2px;">bas</div>
+                </div>` : ""}
+
+            <!-- Radiator labels -->
+            ${m.hasP2 ? html`
+                <div class="abs lbl" style="left: 484px; top: 172px; width: 110px;">P2</div>
+                ${m.hasFlow ? html`
+                    <div class="abs ts click" style="left: 550px; top: 258px; width: 78px; text-align: center;" @click=${this.info("circuit_1_flow_measured_temperature")}>
+                        <div class="num" style="font-size: 24px; line-height: 1;">${show(m.flow, "°")}</div>
+                        <div style="font-size: 11px; margin-top: 2px;">réel</div>
+                        ${m.flowSet !== null ? html`<div style="font-size: 12px; margin-top: 8px;">consigne <b>${m.flowSet}°</b></div>` : ""}
+                    </div>` : ""}` : ""}
+
+            <!-- DHW labels -->
             ${m.hasDhw ? html`
-                <div class="abs ts click" style="left: 544px; top: 324px; width: 80px; text-align: center;" @click=${this.info("domestic_hot_water")}>
-                    <div class="big" style="font-size: 26px;">${show(m.dhw, "°")}</div><div style="font-size: 11px; margin-top: 2px;">ECS</div>
+                ${m.hasP3 ? html`<div class="abs lbl" style="left: 504px; top: 414px; width: 40px;">P3</div>` : ""}
+                <div class="abs ts click" style="left: 554px; top: 424px; width: 70px; text-align: center;" @click=${this.info("domestic_hot_water")}>
+                    <div class="num" style="font-size: 24px; line-height: 1;">${show(m.dhw, "°")}</div>
+                    <div style="font-size: 11px; margin-top: 2px;">ECS</div>
                 </div>` : ""}
 
             <!-- Right panel -->
             <div class="abs panel">
-                <div class="cap">Combustion</div>
-                ${m.lambda !== null ? html`<div class="row click" @click=${this.info("lambda_sensor")}><span>Oxygène (λ)</span><span class="val">${m.lambda} %</span></div>` : ""}
-                <div class="row click" @click=${this.info("fire_sensor")}><span>Photocellule</span>
-                    <span style="display: flex; align-items: center; gap: 8px;">${m.glow ? html`<span class="badge">Braise</span>` : ""}<span class="val">${m.fireText}</span></span></div>
-                <div class="sep"></div>
-                <div class="cap">Alimentation</div>
-                <div class="row click" @click=${this.info("pellet_dispenzer")}><span>Doseur granulés</span><span style="color: ${m.doser ? "#6fd08c" : "#a9b6bb"};">${m.doser ? "Actif" : "Arrêt"}</span></div>
-                <div class="sep"></div>
                 <div class="cap">Prise en charge</div>
                 <div class="seg click ${m.takeAllowed ? "" : "no"}" @click=${this.info("take_over")}>
                     ${takeLabels.map((label, i) => html`<div class="${m.takeAllowed && m.take == i ? "on" : ""}">${label}</div>`)}
                 </div>
+                ${m.hasRoom ? html`
+                    <div class="sep"></div>
+                    <div class="click" style="display: flex; flex-direction: column; gap: 2px;" @click=${this.info("circuit_1_room_measured_temperature")}>
+                        <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; color: #a9b6bb;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a9b6bb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${HOUSE_ICON}</svg>
+                            Maison${m.roomSet !== null ? " · consigne " + m.roomSet + "°" : ""}
+                        </div>
+                        <div class="num" style="font-size: 22px; line-height: 1.1;">${show(m.room, "°")}</div>
+                    </div>` : ""}
             </div>
 
-            <!-- Bottom strip -->
-            <div class="abs strip">
-                <span class="click" @click=${this.info("control_mode")}>Accès chaudière : <b style="color: ${m.locked ? "#ffc2c4" : "#e7ecee"};">${m.locked ? "désactivé" : "autorisé"}</b></span>
-                <span class="click" @click=${this.info("wood_pellet_mode")}>Source : <b>${m.wood ? "bois" : "granulés"}</b></span>
-                ${m.wood ? html`<span>Mode bois — la marche/arrêt se fait sur la chaudière</span>` : ""}
+            <!-- Phase strip: the Centrometal state codes are unknown, so the state text is shown instead -->
+            <div class="abs steps">
+                <span style="color: #8a9aa0;">${m.wood
+                    ? "Mode bois — la marche/arrêt se fait sur la chaudière"
+                    : (m.locked ? "Accès à la chaudière désactivé" : "État : " + m.state)}</span>
             </div>
 
             <!-- Unavailable -->
             ${m.unavailable ? html`
                 <div class="abs veil">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a9b6bb" stroke-width="1.6" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 20 0"></path><path d="M5.5 12.5a10 10 0 0 1 13 0"></path><path d="M9 16a5 5 0 0 1 6 0"></path><path d="M12 20v.01"></path><path d="M3 3l18 18"></path></svg>
-                    <div style="font-size: 22px; font-weight: 600;">Chaudière indisponible</div>
-                    <div style="font-size: 13px; color: #a9b6bb;">Aucune donnée reçue de l'intégration Centrometal</div>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#a9b6bb" stroke-width="1.6" stroke-linecap="round">${WIFI_OFF_ICON}</svg>
+                    <div class="num" style="font-size: 22px;">Chaudière indisponible</div>
+                    <div style="font-size: 13px; color: #a9b6bb;">Aucune donnée reçue du module WiFi Centrometal</div>
                 </div>` : ""}
         </div>
         </div>`
