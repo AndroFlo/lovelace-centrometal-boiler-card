@@ -52,7 +52,12 @@ wood_door: binary_sensor.boiler_door
 domestic_hot_water_target: sensor.dhw_setpoint
 ```
 
-The Bois / Granulés indicator at the top of the synoptic shows the active source only: the Centrometal integration has no command to switch between wood and pellets, this is done on the boiler.
+Switching from wood to pellets: with the [Centrometal integration fork](https://github.com/AndroFlo/hass-centrometal-boiler) 0.0.56 or later, the `button.<product>_pellet_mode` entity is detected and **Granulés** becomes clickable in wood mode (synoptic top bar and dashboard), with a confirmation inside the card. There is no remote way back to wood: that is done on the boiler. Without the entity, in pellet mode, during a take-over or when access to the boiler is disabled, it is an indicator only. If your entity id differs (product prefix disabled), set it in the card:
+
+```
+type: custom:centrometal-boiler-card
+pellet_mode_button: button.pellet_mode
+```
 
 Every value opens the Home Assistant more-info dialog when clicked. The power button asks for confirmation inside the card; it is disabled when access to the boiler is disabled (`control_mode` 2).
 

@@ -58,11 +58,12 @@ The entry file also registers the card in `window.customCards` (card picker) and
 - No entity for these, so they are YAML-only optional keys: `domestic_hot_water_target` (DHW set point) and `wood_door`. Fan speed stays `b_fan` in % (unit attribute used when present).
 - Phase stepper (heuristic, the `b_state` codes are unknown): keywords in the state text (stabil / extin / ignit…), else ignition = fan running without flame; the glow plug is lit during ignition. Hidden in wood mode and when access is disabled (a note replaces it).
 - The pellet burner is lit when `fire_sensor` < 1000 kΩ; `firebox_temperature` is a single sensor, so its label sits under the chamber in use.
-- The power confirmation is local UI state: `modern.confirm` + bump `card.uiTick` to force a render (`shouldUpdate` otherwise only reacts to tracked entities).
+- Wood -> pellets: optional `pellet_mode_button` (detected as `button.biotec*pellet_mode`, integration fork >= 0.0.56, sends `SCCMD` 1); `m.pelletEnabled` = wood mode, access allowed, no take-over in progress. No command back to wood exists.
+- Confirmations are local UI state: `modern.confirm` (`null` / `"power"` / `"pellet"`) + bump `card.uiTick` to force a render (`shouldUpdate` otherwise only reacts to tracked entities).
 - Testing without HA: serve the repo root over HTTP and load the card in a page with a mock `hass` (`{states: {"sensor.biotec_boiler_state": {state: "ON", attributes: {}}, ...}, callService}`) and a stub `ha-card` element; screenshot with headless Chrome.
 
 ## Conventions
-- **Cache-busting version**: every import and image URL carries `?v=0.0.30-beta.6` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30-beta.6' dist`), otherwise browsers mix stale cached modules with new ones.
+- **Cache-busting version**: every import and image URL carries `?v=0.0.30-beta.7` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30-beta.7' dist`), otherwise browsers mix stale cached modules with new ones.
 - Existing style: 4-space indent (2 in `centrometal-boiler-card.js`), inconsistent semicolons, HTML comments `<!-- Section -->` to split templates. Stay consistent with the file being edited; duplication between blocks is accepted (copy the closest neighbouring block and adjust coordinates).
 - Commands: `turn_on`/`turn_off` on the `switch.biotec*boiler_switch` entity via `root.hass.callService`.
 - Document any new option in `README.md` (YAML example; demo GIF `biotec-plus-display.gif` at repo root). `docs/images/` holds screenshots of the redesign mock-ups shown in the README (outside `dist/`, so HACS does not ship them).

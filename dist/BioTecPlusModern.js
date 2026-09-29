@@ -89,6 +89,8 @@ const STYLE = html`<style>
     .syn .src > span { height: 36px; display: flex; align-items: center; padding: 0 14px; border-radius: 9px; color: #6d7d83; font-size: 13px; font-weight: 600; }
     .syn .src > .on { background: #f08a3c; color: #1b1107; }
     .syn .src > .busy { background: #3a2616; color: #ffc98f; }
+    .syn .src > button { height: 36px; padding: 0 14px; border-radius: 9px; border: 1px dashed #f08a3c; background: transparent; color: #f5a261; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .syn .src > button:hover { background: #231a14; }
     .syn .pw { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer; flex-shrink: 0; }
     .syn .pw.on { border: 1.5px solid #f08a3c; background: #231a14; }
     .syn .pw.off { width: auto; padding: 0 16px 0 12px; gap: 8px; border-radius: 22px; border: 1.5px solid #6fd08c; background: #13241a; color: #b8f0c8; font-size: 14px; font-weight: 600; }
@@ -192,7 +194,7 @@ export class BioTecPlusModern {
 
     constructor(display) {
         this.d = display
-        this.confirm = false
+        this.confirm = null     // null, "power" or "pellet": pending confirmation shown inside the card
     }
 
     // ---------------------------------------------------------------- data
@@ -357,6 +359,8 @@ export class BioTecPlusModern {
             powerEnabled: !unavailable && !locked && ("boiler_switch" in d.parameters)
                 && (!wood || d.config["allow_power_in_wood"] === true),
             powerInWood: wood && d.config["allow_power_in_wood"] === true,
+            // Wood -> pellets through the integration's button (SCCMD 1); there is no remote way back to wood
+            pelletEnabled: !unavailable && wood && !locked && take != 1 && has("pellet_mode_button"),
             banner: banner,
         }
     }
@@ -387,18 +391,30 @@ export class BioTecPlusModern {
         if (!m.powerEnabled) {
             return
         }
-        this.confirm = true
+        this.confirm = "power"
         this.refresh()
     }
 
-    cancelPower() {
-        this.confirm = false
+    askPellet(m) {
+        if (!m.pelletEnabled) {
+            return
+        }
+        this.confirm = "pellet"
         this.refresh()
     }
 
-    applyPower(m) {
-        this.d.card.hass.callService("switch", m.off ? "turn_on" : "turn_off", { entity_id: this.d.parameters["boiler_switch"] })
-        this.confirm = false
+    cancelConfirm() {
+        this.confirm = null
+        this.refresh()
+    }
+
+    applyConfirm(m) {
+        if (this.confirm == "pellet") {
+            this.d.card.hass.callService("button", "press", { entity_id: this.d.parameters["pellet_mode_button"] })
+        } else {
+            this.d.card.hass.callService("switch", m.off ? "turn_on" : "turn_off", { entity_id: this.d.parameters["boiler_switch"] })
+        }
+        this.confirm = null
         this.refresh()
     }
 
@@ -419,6 +435,9 @@ export class BioTecPlusModern {
     }
 
     confirmText(m) {
+        if (this.confirm == "pellet") {
+            return "Passer en granulés ? Le retour au bois se fait sur la chaudière."
+        }
         if (m.powerInWood) {
             // The switch drives the controller; the wood fire itself keeps burning
             return m.off
@@ -426,6 +445,10 @@ export class BioTecPlusModern {
                 : "Éteindre la régulation ? Le feu de bois, lui, continue de brûler."
         }
         return m.off ? "Allumer la chaudière ?" : "Éteindre la chaudière ?"
+    }
+
+    confirmLabel(m) {
+        return this.confirm == "pellet" ? "Passer en granulés" : (m.off ? "Allumer" : "Éteindre")
     }
 
     pumpLabel(name, running, demand) {
@@ -465,11 +488,13 @@ export class BioTecPlusModern {
                         <span class="num" style="font-size: 18px; color: #e7ecee;">${show(m.outdoor, " °C")}</span>
                         <span>ext.</span>
                     </div>` : ""}
-                <!-- Source indicator: the integration has no command to switch wood / pellets, it is done on the boiler -->
-                <div class="src" role="status" aria-label="Source de chauffe : ${m.wood ? "bois" : "granulés"}"
-                    title="Source de chauffe (le passage bois / granulés se fait sur la chaudière)">
+                <!-- Source: wood -> pellets through the integration's button when available, never back to wood -->
+                <div class="src" role="group" aria-label="Source de chauffe : ${m.wood ? "bois" : "granulés"}"
+                    title="${m.pelletEnabled ? "Passer en granulés (le retour au bois se fait sur la chaudière)" : "Source de chauffe (le passage bois / granulés se fait sur la chaudière)"}">
                     <span class="${m.wood && !takeBusy ? "on" : ""}">Bois</span>
-                    <span class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}">${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</span>
+                    ${m.pelletEnabled ? html`
+                        <button type="button" class="${this.confirm == "pellet" ? "busy" : ""}" @click=${() => this.askPellet(m)}>Granulés</button>` : html`
+                        <span class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}">${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</span>`}
                 </div>
                 ${this.synopticPower(m)}
             </div>
@@ -478,8 +503,8 @@ export class BioTecPlusModern {
             ${this.confirm ? html`
                 <div class="abs bar-msg confirm">
                     <span style="flex-grow: 1;">${this.confirmText(m)}</span>
-                    <button type="button" class="btn" @click=${() => this.cancelPower()}>Annuler</button>
-                    <button type="button" class="btn primary" @click=${() => this.applyPower(m)}>${m.off ? "Allumer" : "Éteindre"}</button>
+                    <button type="button" class="btn" @click=${() => this.cancelConfirm()}>Annuler</button>
+                    <button type="button" class="btn primary" @click=${() => this.applyConfirm(m)}>${this.confirmLabel(m)}</button>
                 </div>` : (m.banner ? html`
                 <div class="abs bar-msg ${m.banner.kind}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">${ALERT_ICON}</svg>
@@ -758,8 +783,8 @@ export class BioTecPlusModern {
             return html`
                 <div class="msg confirm">
                     <span class="grow">${this.confirmText(m)}</span>
-                    <button type="button" class="btn" @click=${() => this.cancelPower()}>Annuler</button>
-                    <button type="button" class="btn primary" @click=${() => this.applyPower(m)}>${m.off ? "Allumer" : "Éteindre"}</button>
+                    <button type="button" class="btn" @click=${() => this.cancelConfirm()}>Annuler</button>
+                    <button type="button" class="btn primary" @click=${() => this.applyConfirm(m)}>${this.confirmLabel(m)}</button>
                 </div>`
         }
         if (m.unavailable) {
@@ -801,9 +826,11 @@ export class BioTecPlusModern {
                 </div>
                 <div class="facts">
                     <div class="sub">Source active</div>
-                    <div class="src click" @click=${this.info("wood_pellet_mode")}>
-                        <div class="${m.wood ? "on" : ""}">Bois · ${show(m.tw, "°")}</div>
-                        <div class="${m.wood ? "" : "on"}">Granulés · ${show(m.tb, "°")}</div>
+                    <div class="src">
+                        <div class="${m.wood ? "on" : ""} click" @click=${this.info("boiler_temperature_wood")}>Bois · ${show(m.tw, "°")}</div>
+                        ${m.pelletEnabled ? html`
+                            <div class="click" style="outline: 1px dashed var(--cb-heat); outline-offset: -1px;" title="Passer en granulés" @click=${() => this.askPellet(m)}>Passer en granulés</div>` : html`
+                            <div class="${m.wood ? "" : "on"} click" @click=${this.info("boiler_temperature_pellet")}>Granulés · ${show(m.tb, "°")}</div>`}
                     </div>
                     ${m.hasOutdoor ? html`<div class="kv click" @click=${this.info("outdoor_temperature")}><span>Extérieur</span><span>${show(m.outdoor, " °C")}</span></div>` : ""}
                     ${m.hasRoom ? html`<div class="kv click" @click=${this.info("circuit_1_room_measured_temperature")}><span>Maison</span><span>${show(m.room, " °C")}${m.roomSet !== null ? " / " + m.roomSet + " °C" : ""}</span></div>` : ""}
