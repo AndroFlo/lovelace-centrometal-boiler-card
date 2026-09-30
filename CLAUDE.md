@@ -63,12 +63,12 @@ The entry file also registers the card in `window.customCards` (card picker) and
 - Testing without HA: serve the repo root over HTTP and load the card in a page with a mock `hass` (`{states: {"sensor.biotec_boiler_state": {state: "ON", attributes: {}}, ...}, callService}`) and a stub `ha-card` element; screenshot with headless Chrome.
 
 ## Conventions
-- **Cache-busting version**: every import and image URL carries `?v=0.0.30-beta.8` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30-beta.8' dist`), otherwise browsers mix stale cached modules with new ones.
+- **Cache-busting version**: every import and image URL carries `?v=0.0.30` (10 occurrences in `dist/`). HACS only cache-busts the entry file, so bump **all** occurrences together on every release (`grep -rn 'v=0.0.30' dist`), otherwise browsers mix stale cached modules with new ones.
 - Existing style: 4-space indent (2 in `centrometal-boiler-card.js`), inconsistent semicolons, HTML comments `<!-- Section -->` to split templates. Stay consistent with the file being edited; duplication between blocks is accepted (copy the closest neighbouring block and adjust coordinates).
 - Commands: `turn_on`/`turn_off` on the `switch.biotec*boiler_switch` entity via `root.hass.callService`.
 - Document any new option in `README.md` (YAML example; demo GIF `biotec-plus-display.gif` at repo root). `docs/images/` holds screenshots of the redesign mock-ups shown in the README (outside `dist/`, so HACS does not ship them).
 
 ## Release (HACS)
 1. Bump the `?v=` version in `dist/` and commit on `main`.
-2. Push a tag equal to that version (`git tag 0.0.30 && git push origin 0.0.30`). `.github/workflows/release.yml` checks that every `?v=` in `dist/` matches the tag, then publishes the GitHub release, which HACS offers as a version. A suffixed tag (`0.0.30-beta.1`) becomes a pre-release, offered by HACS only with "Show beta versions"; betas are cut from the `beta` branch (BioTec Plus only), while `main` stays on the multi-boiler 0.0.29.
+2. Push a tag equal to that version (`git tag 0.0.30 && git push origin 0.0.30`). `.github/workflows/release.yml` checks that every `?v=` in `dist/` matches the tag, then publishes the GitHub release, which HACS offers as a version. Use plain versions: a suffixed tag (`0.0.31-beta.1`) becomes a pre-release, offered by HACS only with "Show beta versions", which the user cannot enable. `main` is the BioTec Plus only card (the multi-boiler version ended with 0.0.29).
 3. HACS validation needs the GitHub repo to have a description, topics and issues enabled.

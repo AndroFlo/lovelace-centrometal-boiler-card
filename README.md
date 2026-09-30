@@ -81,11 +81,11 @@ Prefix is optional, if defined when adding device to HA all entities are prefixe
 
 | `synoptic` | `synoptic` (wood mode) |
 |---|---|
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-synoptic.png" width="420" alt="Synoptic layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-synoptic-wood.png" width="420" alt="Synoptic layout in wood mode"> |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-synoptic.png" width="420" alt="Synoptic layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-synoptic-wood.png" width="420" alt="Synoptic layout in wood mode"> |
 
 | `dashboard` | `compact` and `tile` |
 |---|---|
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-dashboard.png" width="300" alt="Dashboard layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-compact.png" width="300" alt="Compact layout"><br><img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/card-tile.png" width="300" alt="Tile layout"> |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-dashboard.png" width="300" alt="Dashboard layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-compact.png" width="300" alt="Compact layout"><br><img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-tile.png" width="300" alt="Tile layout"> |
 
 `classic` layout:
 
@@ -97,16 +97,16 @@ The mock-ups the layouts above were built from. Values are illustrative; the pha
 
 | A · Modern synoptic | B · Dashboard | C · Compact card & tile |
 |---|---|---|
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-a-synoptic.png" width="420" alt="Modern synoptic"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-b-dashboard.png" width="220" alt="Dashboard"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/proposal-c-compact.png" width="220" alt="Compact card and tile"> |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-a-synoptic.png" width="420" alt="Modern synoptic"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-b-dashboard.png" width="220" alt="Dashboard"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/proposal-c-compact.png" width="220" alt="Compact card and tile"> |
 
 ### Usage scenarios (synoptic)
 
 | | |
 |---|---|
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-01-off.png" width="420" alt="Off"><br>Off | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-02-ignition.png" width="420" alt="Ignition in progress"><br>Ignition in progress |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-03-stabilisation.png" width="420" alt="Stabilisation"><br>Stabilisation | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-04-running.png" width="420" alt="Heating — pump P1 running"><br>Heating — pump P1 running |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-05-dhw.png" width="420" alt="DHW charging — pump P2 running"><br>DHW charging — pump P2 running | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-06-wood.png" width="420" alt="Wood mode"><br>Wood mode |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-07-takeover.png" width="420" alt="Take-over wood → pellets"><br>Take-over wood → pellets | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-08-extinction.png" width="420" alt="Extinction / post-ventilation"><br>Extinction / post-ventilation |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-09-reserve.png" width="420" alt="Pellet reserve reached"><br>Pellet reserve reached | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-10-empty.png" width="420" alt="Pellet silo empty"><br>Pellet silo empty |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-11-locked.png" width="420" alt="Boiler access disabled"><br>Boiler access disabled | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-12-fault.png" width="420" alt="Fault"><br>Fault |
-| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/beta/docs/images/scenario-13-unavailable.png" width="420" alt="Boiler unavailable"><br>Boiler unavailable | |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-01-off.png" width="420" alt="Off"><br>Off | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-02-ignition.png" width="420" alt="Ignition in progress"><br>Ignition in progress |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-03-stabilisation.png" width="420" alt="Stabilisation"><br>Stabilisation | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-04-running.png" width="420" alt="Heating — pump P1 running"><br>Heating — pump P1 running |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-05-dhw.png" width="420" alt="DHW charging — pump P2 running"><br>DHW charging — pump P2 running | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-06-wood.png" width="420" alt="Wood mode"><br>Wood mode |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-07-takeover.png" width="420" alt="Take-over wood → pellets"><br>Take-over wood → pellets | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-08-extinction.png" width="420" alt="Extinction / post-ventilation"><br>Extinction / post-ventilation |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-09-reserve.png" width="420" alt="Pellet reserve reached"><br>Pellet reserve reached | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-10-empty.png" width="420" alt="Pellet silo empty"><br>Pellet silo empty |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-11-locked.png" width="420" alt="Boiler access disabled"><br>Boiler access disabled | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-12-fault.png" width="420" alt="Fault"><br>Fault |
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/scenario-13-unavailable.png" width="420" alt="Boiler unavailable"><br>Boiler unavailable | |
