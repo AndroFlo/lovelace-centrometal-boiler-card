@@ -363,6 +363,13 @@ export class BioTecPlusModern {
             powerInWood: wood && d.config["allow_power_in_wood"] === true,
             // Wood -> pellets through the integration's button (SCCMD 1); there is no remote way back to wood
             pelletEnabled: !unavailable && wood && !locked && take != 1 && has("pellet_mode_button"),
+            // Why the switch to pellets is not offered, shown when the greyed "Granulés" is tapped
+            pelletReason: !wood || take == 1 ? ""
+                : unavailable ? "Chaudière indisponible"
+                : locked ? "Accès à distance désactivé sur la chaudière (control_mode 2)"
+                : !("pellet_mode_button" in d.parameters) ? "Bouton granulés introuvable : aucune entité button.…pellet_mode (intégration 0.0.56 ou plus). Renseigner pellet_mode_button dans la carte."
+                : !has("pellet_mode_button") ? "Bouton granulés indisponible dans Home Assistant (" + d.parameters["pellet_mode_button"] + ")"
+                : "",
             banner: banner,
         }
     }
@@ -402,6 +409,15 @@ export class BioTecPlusModern {
             return
         }
         this.confirm = "pellet"
+        this.refresh()
+    }
+
+    explainPellet(m) {
+        if (!m.pelletReason) {
+            return
+        }
+        this.confirm = "notice"
+        this.notice = m.pelletReason
         this.refresh()
     }
 
@@ -496,13 +512,18 @@ export class BioTecPlusModern {
                     <span class="${m.wood && !takeBusy ? "on" : ""}">Bois</span>
                     ${m.pelletEnabled ? html`
                         <button type="button" class="${this.confirm == "pellet" ? "busy" : ""}" @click=${() => this.askPellet(m)}>Granulés</button>` : html`
-                        <span class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}">${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</span>`}
+                        <span class="${takeBusy || m.plug ? "busy" : (m.wood ? "" : "on")}" style="${m.pelletReason ? "cursor: pointer;" : ""}"
+                            title="${m.pelletReason}" @click=${() => this.explainPellet(m)}>${takeBusy ? "Prise en charge…" : (m.plug ? "Allumage…" : "Granulés")}</span>`}
                 </div>
                 ${this.synopticPower(m)}
             </div>
 
             <!-- Banner / power confirmation -->
-            ${this.confirm ? html`
+            ${this.confirm == "notice" ? html`
+                <div class="abs bar-msg warn">
+                    <span style="flex-grow: 1;">${this.notice}</span>
+                    <button type="button" class="btn" @click=${() => this.cancelConfirm()}>OK</button>
+                </div>` : this.confirm ? html`
                 <div class="abs bar-msg confirm">
                     <span style="flex-grow: 1;">${this.confirmText(m)}</span>
                     <button type="button" class="btn" @click=${() => this.cancelConfirm()}>Annuler</button>
