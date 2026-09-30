@@ -52,7 +52,7 @@ wood_door: binary_sensor.boiler_door
 domestic_hot_water_target: sensor.dhw_setpoint
 ```
 
-Switching from wood to pellets: with the [Centrometal integration fork](https://github.com/AndroFlo/hass-centrometal-boiler) 0.0.56 or later, the `button.<product>_pellet_mode` entity is detected and **Granulés** becomes clickable in wood mode (synoptic top bar and dashboard), with a confirmation inside the card. There is no remote way back to wood: that is done on the boiler. Without the entity, in pellet mode, during a take-over or when access to the boiler is disabled, it is an indicator only. If your entity id differs (product prefix disabled), set it in the card:
+Switching from wood to pellets: with the [Centrometal integration fork](https://github.com/AndroFlo/hass-centrometal-boiler) 0.0.56 or later, any `button.…pellet_mode` entity is detected and **Granulés** becomes clickable in wood mode (synoptic top bar and dashboard), with a confirmation inside the card. There is no remote way back to wood: that is done on the boiler. Without the entity, in pellet mode, during a take-over or when access to the boiler is disabled, it is an indicator only; tapping the greyed **Granulés** tells why. If your entity id does not end with `pellet_mode`, set it in the card:
 
 ```
 type: custom:centrometal-boiler-card

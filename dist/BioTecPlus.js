@@ -2,9 +2,9 @@ import {
     html,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.30"
-import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.30"
-import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.30"
+import { DisplaySubArea } from "./DisplaySubArea.js?v=0.0.31"
+import { DisplayWithPowerButton } from "./DisplayWithPowerButton.js?v=0.0.31"
+import { BioTecPlusModern } from "./BioTecPlusModern.js?v=0.0.31"
 
 export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
@@ -56,8 +56,9 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
 
             // Service
             this.configureParameter("switch.biotec", "boiler_switch")
-            // Wood -> pellets command (integration >= 0.0.56: button.<product>_pellet_mode)
-            this.configureParameter("button.biotec", "pellet_mode_button|pellet_mode", "optional")
+            // Wood -> pellets command (integration >= 0.0.56). Any button.*pellet_mode: the product
+            // part of the entity id depends on the integration's naming options.
+            this.configureParameter("button.", "pellet_mode_button|pellet_mode", "optional")
 
         } catch (error) {
             return error;
@@ -189,7 +190,7 @@ export class BioTecPlusDisplay extends DisplayWithPowerButton {
             ${this.conditional(this.values["boiler_state"] != "OFF",
                 this.createImage("biopl/playradi.gif", 942, 390, 40, null, 4, "boiler_state"),
                 this.createText("", 32,
-                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.30'); background-position: 0px 0px;",
+                    "display:block; background-repeat: no-repeat; background-image: url('" + this.images_folder + "biopl/start_stop.png?v=0.0.31'); background-position: 0px 0px;",
                     945, 390, 36, 36, 4, null, "boiler_state"))}
 
             <!-- Buffers -->
