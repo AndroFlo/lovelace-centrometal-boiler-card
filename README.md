@@ -18,6 +18,31 @@ Home assistant lovelace card to support the Centrometal (https://www.centrometal
 
 The images are loaded from `/local/community/lovelace-centrometal-boiler-card/images/`, so keep this folder name.
 
+## Choosing a layout
+
+The card comes in five layouts, picked with the `layout` option (card 0.0.30 or later). In the dashboard, choose **Edit → Add card → Manual** and paste one of these:
+
+| Layout | YAML | Best for |
+|---|---|---|
+| Synoptic (default) | `type: custom:centrometal-boiler-card` | full-width view of the whole installation |
+| Dashboard | `type: custom:centrometal-boiler-card`<br>`layout: dashboard` | half-width column, follows the HA theme |
+| **Compact** | `type: custom:centrometal-boiler-card`<br>`layout: compact` | small card: boiler temperature, state, buffer bar, key values |
+| Tile | `type: custom:centrometal-boiler-card`<br>`layout: tile` | a single line in a sections dashboard |
+| Classic | `type: custom:centrometal-boiler-card`<br>`layout: classic` | the original Centrometal display |
+
+For example, a compact card:
+
+```yaml
+type: custom:centrometal-boiler-card
+layout: compact
+```
+
+| `compact` | `tile` |
+|---|---|
+| <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-compact.png" width="300" alt="Compact layout"> | <img src="https://github.com/AndroFlo/lovelace-centrometal-boiler-card/raw/main/docs/images/card-tile.png" width="300" alt="Tile layout"> |
+
+In a sections dashboard, `dashboard`, `compact` and `tile` take half the width; `synoptic` and `classic` take the full width. If the layout does not change after an update, reload the browser without cache (Ctrl+F5). Screenshots of every layout are in [Screenshots](#screenshots).
+
 ## Configuration
 
 ```
@@ -78,6 +103,8 @@ Prefix is optional, if defined when adding device to HA all entities are prefixe
 - type: custom:centrometal-boiler-card
   prefix: jack
 ```
+
+## Screenshots
 
 | `synoptic` | `synoptic` (wood mode) |
 |---|---|
