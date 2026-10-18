@@ -269,6 +269,11 @@ export class BioTecPlusModern {
 
         const door = isOn("wood_door")
 
+        // Radiator branch: a mixing heating circuit has its own pump (C1B_P). The boiler's
+        // P2 output only drives the radiators when no circuit 1 pump is published.
+        const radPump = ("circuit_1_pump" in v) ? "circuit_1_pump" : "second_pump"
+        const radDemand = radPump == "circuit_1_pump" ? "circuit_1_pump_demand" : "second_pump_demand"
+
         let banner = null
         if (locked) {
             banner = { kind: "danger", text: "Accès à la chaudière temporairement désactivé" }
@@ -321,7 +326,7 @@ export class BioTecPlusModern {
             hasOutdoor: "outdoor_temperature" in v,
             dep: temp("circuit_1_flow_measured_temperature"),
             depSet: temp("circuit_1_flow_target_temperature"),
-            hasRad: ("second_pump" in v) || ("circuit_1_flow_measured_temperature" in v),
+            hasRad: ("second_pump" in v) || ("circuit_1_pump" in v) || ("circuit_1_flow_measured_temperature" in v),
             room: temp("circuit_1_room_measured_temperature"),
             roomSet: temp("circuit_1_room_target_temperature"),
             hasRoom: "circuit_1_room_measured_temperature" in v,
@@ -340,6 +345,11 @@ export class BioTecPlusModern {
             doser: doser,
             p1: v["boiler_pump"] == 1,
             p1d: v["boiler_pump_demand"] == 1,
+            hasRadPump: radPump in v,
+            radOn: v[radPump] == 1,
+            radDemand: v[radDemand] == 1,
+            radLabel: radPump == "circuit_1_pump" ? "C1" : "P2",
+            radEntity: radPump,
             hasP2: "second_pump" in v,
             p2: v["second_pump"] == 1,
             p2d: v["second_pump_demand"] == 1,
@@ -633,18 +643,18 @@ export class BioTecPlusModern {
                     <rect x="400" y="30" width="30" height="370" rx="15" fill="#151e22" stroke="#26343a" stroke-width="1.5"></rect>
                     <path d="M360 96 H400 M400 360 H360${m.hasRad ? " M430 90 H470 M470 250 H430" : ""}${m.hasDhw ? " M430 280 H470 M470 336 H430" : ""}" fill="none" stroke="${GREY}" opacity="0.35" stroke-width="5"></path>`}
 
-                <!-- Buffer -> radiators, pump P2 -->
+                <!-- Buffer -> radiators, circuit pump (C1 or P2) -->
                 ${m.hasRad ? svg`
-                    <path d="M470 90 H590 V124" fill="none" stroke="${pipe(m.p2, "#f08a3c")}" opacity="0.35" stroke-width="5"></path>
-                    <path d="M540 226 V250 H470" fill="none" stroke="${pipe(m.p2, "#4aa3df")}" opacity="0.35" stroke-width="5"></path>
-                    ${m.p2 ? svg`
+                    <path d="M470 90 H590 V124" fill="none" stroke="${pipe(m.radOn, "#f08a3c")}" opacity="0.35" stroke-width="5"></path>
+                    <path d="M540 226 V250 H470" fill="none" stroke="${pipe(m.radOn, "#4aa3df")}" opacity="0.35" stroke-width="5"></path>
+                    ${m.radOn ? svg`
                         <path d="M470 90 H590 V124" fill="none" class="flow" stroke="#f08a3c" stroke-width="4" stroke-linecap="round"></path>
                         <path d="M540 226 V250 H470" fill="none" class="flow" stroke="#4aa3df" stroke-width="4" stroke-linecap="round"></path>` : ""}
-                    ${m.hasP2 ? svg`
-                        <g class="click" @click=${this.info("second_pump")}>
-                            <circle cx="515" cy="90" r="15" fill="#0e1417" stroke="${m.p2 ? "#a9b6bb" : "#4d5c62"}" stroke-width="2"></circle>
-                            <path class="${m.p2 ? "spin" : ""}" d="M510 82 L523 90 L510 98 Z" fill="${m.p2 ? "#cfd8db" : "#4d5c62"}"></path>
-                            ${m.p2d ? svg`<circle cx="529" cy="75" r="4" fill="#6fd08c"></circle>` : ""}
+                    ${m.hasRadPump ? svg`
+                        <g class="click" @click=${this.info(m.radEntity)}>
+                            <circle cx="515" cy="90" r="15" fill="#0e1417" stroke="${m.radOn ? "#a9b6bb" : "#4d5c62"}" stroke-width="2"></circle>
+                            <path class="${m.radOn ? "spin" : ""}" d="M510 82 L523 90 L510 98 Z" fill="${m.radOn ? "#cfd8db" : "#4d5c62"}"></path>
+                            ${m.radDemand ? svg`<circle cx="529" cy="75" r="4" fill="#6fd08c"></circle>` : ""}
                         </g>` : ""}
                     <g class="click" @click=${this.info("circuit_1_flow_measured_temperature")}>
                         <rect x="526" y="124" width="78" height="102" rx="6" fill="${na ? GREY : tempColor(m.dep)}"></rect>
@@ -731,7 +741,7 @@ export class BioTecPlusModern {
                     </div>
                 </div>` : ""}
             ${m.hasRad ? html`
-                ${m.hasP2 ? html`<div class="abs lbl" style="left: 484px; top: ${m.hasRoom ? 172 : 150}px; width: 110px;">${this.pumpLabel("P2", m.p2, m.p2d)}</div>` : ""}
+                ${m.hasRadPump ? html`<div class="abs lbl" style="left: 484px; top: ${m.hasRoom ? 172 : 150}px; width: 110px;">${this.pumpLabel(m.radLabel, m.radOn, m.radDemand)}</div>` : ""}
                 <div class="abs ts click" style="left: 550px; top: 274px; width: 78px;" @click=${this.info("circuit_1_flow_measured_temperature")}>
                     <div class="num" style="font-size: 24px; line-height: 1;">${show(m.dep, "°")}</div>
                     ${m.depSet !== null ? html`<div style="font-size: 10px; margin-top: 3px;">consigne ${m.depSet}°</div>` : ""}
@@ -878,7 +888,7 @@ export class BioTecPlusModern {
                 <div class="tile click" style="justify-content: space-between;" @click=${this.info("circuit_1_flow_measured_temperature")}>
                     <div class="cap">Radiateurs</div>
                     <div class="xl num">${show(m.dep, "°")}</div>
-                    <div class="sub">${m.depSet !== null ? "consigne " + m.depSet + "° · " : ""}${m.hasP2 ? this.pumpLabel("P2", m.p2, m.p2d) : ""}</div>
+                    <div class="sub">${m.depSet !== null ? "consigne " + m.depSet + "° · " : ""}${m.hasRadPump ? this.pumpLabel(m.radLabel, m.radOn, m.radDemand) : ""}</div>
                 </div>` : ""}
                 ${m.hasDhw ? html`
                 <div class="tile click" style="justify-content: space-between;" @click=${this.info("domestic_hot_water")}>
@@ -914,6 +924,7 @@ export class BioTecPlusModern {
                 ${this.dashboardGauge("Air secondaire", m.airS, "air_flow_engine_secondary")}
                 <div class="two">
                     ${this.dashboardPump("Pompe P1", m.p1, m.p1d, "boiler_pump")}
+                    ${m.hasRadPump && m.radEntity != "second_pump" ? this.dashboardPump("Pompe " + m.radLabel, m.radOn, m.radDemand, m.radEntity) : ""}
                     ${m.hasP2 ? this.dashboardPump("Pompe P2", m.p2, m.p2d, "second_pump") : ""}
                     ${m.hasP3 ? this.dashboardPump("Pompe P3", m.p3, m.p3d, "third_pump") : ""}
                 </div>
@@ -991,7 +1002,7 @@ export class BioTecPlusModern {
             <div class="grid">
                 ${m.hasRad ? html`
                 <div class="box click" @click=${this.info("circuit_1_flow_measured_temperature")}>
-                    <span>Radiateurs${m.hasP2 ? " · P2" : ""}</span>
+                    <span>Radiateurs${m.hasRadPump ? " · " + m.radLabel : ""}</span>
                     <span><b class="num">${show(m.dep, "°")}</b> ${m.depSet !== null ? html`<span class="set">consigne ${m.depSet}°</span>` : ""}</span>
                 </div>` : ""}
                 ${m.hasRoom ? html`

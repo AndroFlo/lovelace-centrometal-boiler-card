@@ -56,13 +56,15 @@ debug: true (optional)
 Only the BioTec Plus is supported. The entities are detected automatically; the former `device_type: biopl` option is still accepted, any other value shows an error.
 
 layout: (optional)
-- `synoptic` (default): schematic of the whole installation — flue duct with the fan and the chimney (smoke above 80 °C), wood and pellet chambers with live flames, glow plug and photocell, P1 to the buffer tank, P2 to the radiator with the room thermostat, P3 to the DHW tank, tanks coloured by temperature, plus the pellet cycle phases (Arrêt → Allumage → Stabilisation → Fonctionnement → Extinction). Scales with the card width.
+- `synoptic` (default): schematic of the whole installation — flue duct with the fan and the chimney (smoke above 80 °C), wood and pellet chambers with live flames, glow plug and photocell, P1 to the buffer tank, the heating circuit pump to the radiator with the room thermostat, P3 to the DHW tank, tanks coloured by temperature, plus the pellet cycle phases (Arrêt → Allumage → Stabilisation → Fonctionnement → Extinction). Scales with the card width.
 - `dashboard`: tiles following the Home Assistant theme (light or dark), for a half-width column.
 - `compact`: boiler temperature, state, buffer bar and key values.
 - `tile`: a single line for sections dashboards.
 - `classic`: the original Centrometal display.
 
 The radiator, the room thermostat and P3 are drawn only when the matching entities exist (heating circuit 1: `c1b_tpol1`, `c1b_tpol`, `c1b_tsob1`, `c1b_tsob`; third pump: `b_p3`, `b_zahp3`). Fan speed is shown as the percentage reported by `b_fan`.
+
+The pump of the radiator branch is the pump of heating circuit 1 (`c1b_p`, `c1b_onoff`, labelled **C1**) when that circuit is published by the integration, since a mixing circuit has its own pump; the boiler output P2 (`b_p2`, `b_zahp2`) is used instead when there is no such circuit. The `dashboard` layout lists both when both exist.
 
 Two values have no Centrometal entity and are only shown if you point the card at one:
 
