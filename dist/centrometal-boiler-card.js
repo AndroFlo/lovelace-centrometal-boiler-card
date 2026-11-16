@@ -3,7 +3,7 @@ import {
   LitElement,
 } from "https://unpkg.com/lit-element@2.0.1/lit-element.js?module";
 
-import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.32"
+import { BioTecPlusDisplay } from "./BioTecPlus.js?v=0.0.33"
 
 class LovelaceCentrometalBoilerCard extends LitElement {
 
@@ -58,7 +58,8 @@ class LovelaceCentrometalBoilerCard extends LitElement {
     }
     if (changedProperties.has("hass")) {
       if (typeof this.display === 'string' || this.display instanceof String) {
-        return false;
+        // Configuration failed (e.g. entities not loaded yet after a HA restart): retry
+        return true;
       }
       if (this.display != null) {
         const oldHass = changedProperties.get("hass");
